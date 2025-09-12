@@ -105,3 +105,43 @@ const sampleBox = document.getElementById('sampleBox');
 if(sampleBtn && sampleBox){
   sampleBtn.addEventListener('click', () => sampleBox.classList.toggle('open'));
 }
+// Read Sample toggle
+const sampleBtn = document.getElementById('readSampleBtn');
+const sampleBox = document.getElementById('sampleBox');
+if(sampleBtn && sampleBox){
+  sampleBtn.addEventListener('click', () => sampleBox.classList.toggle('open'));
+}
+
+// ===== Background music handling =====
+const bgm = document.getElementById('bgm');
+const musicBtn = document.getElementById('musicToggle');
+
+if (bgm && musicBtn) {
+  bgm.volume = 0.25; // softer
+  bgm.play().then(() => {
+    musicBtn.textContent = 'Pause music';
+  }).catch(() => {
+    musicBtn.textContent = 'Play music';
+  });
+
+  const unlock = () => {
+    bgm.play().then(() => {
+      musicBtn.textContent = 'Pause music';
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    }).catch(() => {});
+  };
+  window.addEventListener('pointerdown', unlock, { once: true });
+  window.addEventListener('keydown', unlock, { once: true });
+  window.addEventListener('touchstart', unlock, { once: true });
+
+  musicBtn.addEventListener('click', () => {
+    if (bgm.paused) {
+      bgm.play().then(() => musicBtn.textContent = 'Pause music');
+    } else {
+      bgm.pause();
+      musicBtn.textContent = 'Play music';
+    }
+  });
+}
