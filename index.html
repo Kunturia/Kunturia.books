@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kunturia — The End of Two Souls</title>
+  <meta name="description" content="Official site for Kunturia's novel: The End of Two Souls. Xianxia fantasy with vows, sakura, and a shelf built for future books.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="sakura"></canvas>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="#top">Kunturia Writing</a>
+      <nav class="nav">
+        <a href="#book">Book</a>
+        <a href="#shelf">Shelf</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner wrap">
+        <div class="hero-copy">
+          <h1 class="title">The End of Two Souls</h1>
+          <p class="subtitle">A novel by Kunturia</p>
+          <p class="blurb">
+            In a world where vows outlive lifetimes, a healer reborn crosses paths with a fallen war god. The heavens keep their ledgers, but the heart keeps its own.
+          </p>
+          <div class="cta-row">
+            <a class="btn primary" href="#book">View Details</a>
+            <a class="btn ghost" href="#contact">Get Updates</a>
+          </div>
+        </div>
+        <div class="hero-art">
+          <img src="assets/end-of-two-souls-cover.png" alt="The End of Two Souls cover">
+        </div>
+      </div>
+    </section>
+
+    <section id="book" class="book spotlight">
+      <div class="wrap grid">
+        <div class="card cover">
+          <img src="assets/end-of-two-souls-cover.png" alt="The End of Two Souls cover">
+        </div>
+        <div class="card detail">
+          <h2>The End of Two Souls</h2>
+          <p class="meta">Status: Ongoing · Year: 2025 · Genre: Xianxia, dark fantasy, romance</p>
+          <p class="desc">
+            A reincarnated soul without memory, a god bound by sin, and a forest that remembers every vow. Snow falls in summer when the heavens lie, and petals drift when blades are drawn.
+          </p>
+          <ul class="facts">
+            <li>Worlds: Heaven, Mortal, Demon</li>
+            <li>Motifs: vows, memory, resurrection, lotus</li>
+            <li>Tone: semi-old xianxia, layered scenes</li>
+          </ul>
+          <div class="cta-row">
+            <a class="btn primary" href="#" aria-disabled="true">Read Sample (soon)</a>
+            <a class="btn ghost" href="#contact">Contact Author</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="shelf" class="shelf">
+      <div class="wrap">
+        <h2>Bookshelf</h2>
+        <p class="shelf-note">Your shelf is ready for more titles. For now, the spotlight rests on this volume.</p>
+        <div class="shelf-grid">
+          <article class="book-card">
+            <div class="spine"></div>
+            <img src="assets/end-of-two-souls-cover.png" alt="The End of Two Souls cover">
+            <div class="info">
+              <h3>The End of Two Souls</h3>
+              <p>Xianxia · Ongoing</p>
+              <a class="btn tiny" href="#book">Details</a>
+            </div>
+          </article>
+          <!-- Future books: duplicate .book-card blocks -->
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <div class="wrap grid-2">
+        <div>
+          <h2>About Kunturia</h2>
+          <p>
+            Kunturia writes fantasies that braid tenderness with sharp edges. Expect layered scenes, vows that echo, and steel hidden beneath silk. The prose leans semi-old xianxia in tone, steady and deliberate.
+          </p>
+        </div>
+        <ul class="about-list">
+          <li><strong>Genres:</strong> Xianxia, dark fantasy, romance</li>
+          <li><strong>Update cadence:</strong> Serial arcs with extras</li>
+          <li><strong>Where to read:</strong> Personal site; links soon</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <div class="wrap grid-2">
+        <div>
+          <h2>Stay in the loop</h2>
+          <p>Get chapter drops and art. No spam.</p>
+          <form class="subscribe" onsubmit="subscribe(event)">
+            <label class="sr-only" for="email">Email</label>
+            <input id="email" type="email" placeholder="your@email.com" required>
+            <button class="btn primary" type="submit">Subscribe</button>
+          </form>
+          <p class="small">You can replace this with MailerLite, Buttondown, or any form later.</p>
+        </div>
+        <div class="links">
+          <a href="#" class="link-row">Wattpad — Serial chapters</a>
+          <a href="#" class="link-row">Twitter / X — Updates and art</a>
+          <a href="#" class="link-row">Email — hello@kunturia.example</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© <span id="year"></span> Kunturia</p>
+      <nav>
+        <a href="#book">Book</a>
+        <a href="#shelf">Shelf</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
