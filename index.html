@@ -1,19 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kunturia — The End of Two Souls</title>
-  <meta name="description" content="Official site for Kunturia’s BL novel The End of Two Souls. Red-gold ambience, sakura, butterflies, and a bookshelf for future releases." />
+  <meta name="description" content="Official site for Kunturia’s BL novel The End of Two Souls. Firefly ambience, red-gold panels, and a simple shelf." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
- <body id="top">
-  <!-- Ambient canvas ( butterfly + sparks).
-       pointer-events is disabled in CSS so it never blocks clicks. -->
-  <canvas id="butterfly"></canvas>
+<body id="top">
+  <!-- Background canvas (fireflies) -->
+  <canvas id="fireflies"></canvas>
 
   <!-- Header -->
   <header class="site-header">
@@ -29,160 +28,106 @@
   </header>
 
   <main>
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-inner wrap">
-        <div class="hero-copy">
+    <!-- Book / Hero -->
+    <section id="book" class="panel hero">
+      <div class="wrap hero-grid">
+        <div class="hero-text">
           <h1 class="title">The End of Two Souls</h1>
           <p class="subtitle">A BL novel by Kunturia</p>
-          <p class="blurb">
-            Vows that refuse to die. Petals that fall when blades are drawn.
-            Step into a red-gold world where memory and fate pull the same thread.
+          <p class="lead">
+            Vows that refuse to die. Petals that fall when blades are drawn. Step into a red-gold world where memory and fate pull the same thread.
           </p>
-          <div class="cta-row">
-            <a class="btn primary" href="#book">View Details</a>
-            <a class="btn ghost" href="#contact">Follow Updates</a>
+          <div class="btns">
+            <a class="btn" href="#details">View Details</a>
+            <a class="btn ghost" href="#follow">Follow Updates</a>
           </div>
         </div>
-        <div class="hero-art">
-          <img src="assets/end-of-two-souls-cover.png" alt="The End of Two Souls cover" />
-        </div>
+
+        <figure class="cover">
+          <img src="assets/end-of-two-souls-cover.png" alt="Book cover: The End of Two Souls" />
+        </figure>
       </div>
     </section>
 
-    <!-- Spotlight: Book -->
-    <section id="book" class="book spotlight">
-      <div class="wrap grid">
-        <div class="card cover">
-          <img src="assets/end-of-two-souls-cover.png" alt="The End of Two Souls cover" />
-        </div>
-        <div class="card detail">
-          <h2>The End of Two Souls</h2>
-          <p class="meta">Status: Ongoing · Year: 2025 · Genre: Chinese BL, dark fantasy, romance</p>
+    <!-- Details / Sample -->
+    <section id="details" class="panel">
+      <div class="wrap">
+        <h2 class="h">About the Book</h2>
+        <p class="meta">
+          <strong>Status:</strong> Ongoing · <strong>Year:</strong> 2025 ·
+          <strong>Genre:</strong> BL, dark fantasy, romance
+        </p>
+        <p>
+          A reincarnated soul without memory, a god bound by sin, and a forest that remembers every vow.
+          Snow falls in summer when the heavens lie, and petals drift when blades are drawn.
+        </p>
+        <ul class="bullets">
+          <li><strong>Worlds:</strong> Heaven, Mortal, Demon</li>
+          <li><strong>Motifs:</strong> vows, memory, resurrection, lotus</li>
+          <li><strong>Tone:</strong> semi-old cultivation, layered scenes</li>
+        </ul>
 
-          <p class="desc ornament"><em>双魂终结 Shuāng Hún Zhōng Jié</em></p>
-          <p class="desc">
-            Long ago, two souls were bound. One rose as a loyal protector of the heavens,
-            the other fell into shadow and became a demon lord. Now the realms stand on the brink:
-            gods and demons at war, former companions on opposite sides. When their paths cross again,
-            memory and buried feeling awaken. Their final struggle will decide the fate of mortals,
-            and which soul remains… and which vanishes.
+        <button id="readSampleBtn" class="btn small">Read Sample</button>
+        <div id="sampleBox" class="sample">
+          <p><em>The years had not been kind to Xin Zhi.</em></p>
+          <p>In the Heavenly Court, whispers followed him wherever he went.</p>
+          <p>“He’s a weak god…” “Only knows how to heal scratches…” “A candle in the wind—better snuffed out than sheltered.”</p>
+          <p>
+            Xin Zhi smiled softly, as he always did, and let the words pass through him like rain on stone…
+            (sample trimmed for page length)
           </p>
-
-          <p class="desc">
-            A reincarnated soul without memory, a god bound by sin, and a forest that keeps every vow.
-            Snow falls in summer when the heavens lie, and petals drift when blades are drawn.
-          </p>
-
-          <ul class="facts">
-            <li><strong>Worlds:</strong> Heaven, Mortal, Demon</li>
-            <li><strong>Motifs:</strong> vows, memory, resurrection, lotus</li>
-            <li><strong>Tone:</strong> semi-old cultivation, layered scenes</li>
-          </ul>
-
-          <div class="cta-row">
-            <button id="readSampleBtn" class="btn primary">Read Sample</button>
-            <a class="btn ghost" href="#contact">Contact Author</a>
-          </div>
-
-          <!-- Read Sample -->
-          <div id="sampleBox" class="sample">
-            <h3>Sample</h3>
-            <p><em>The years had not been kind to Xin Zhi.</em></p>
-            <p>In the Heavenly Court, whispers followed him wherever he went.</p>
-            <p>“He’s a weak god…” “Only knows how to heal scratches…” “A candle in the wind—better snuffed out than sheltered.”</p>
-            <p>Xin Zhi smiled softly, as he always did, and let the words pass like rain on stone. His days were quiet—healing the injured, tending mortal prayers, and walking the gardens with Emperor Rui, the one friend who offered him a fragment of warmth. Rui’s fondness had grown beyond friendship, though Xin Zhi, gentle and unassuming, never pressed to name it.</p>
-            <p>Then came a decree: Xin Zhi was to join the battlefield. No explanation. No protest. He accepted.</p>
-            <p>The mortal realm was chaos. Demons rose like a plague. Amid the clash, a junior soldier stumbled into the front line, armor ill-fitted, helm polished bright. He was meant to be a healer—Mo Yuan had requested one—but no one told Xin Zhi. Seeing soldiers charge, he simply followed.</p>
-            <p>From afar, Mo Yuan—commander of the Five Legions—saw him. The soldier’s swings were wide, his footing clumsy; he nearly struck allies and decapitated a demon already dead. The formation faltered. When the raid ended, the ground was red, and Mo Yuan’s fury was a storm inside his ribs.</p>
-            <p>In the command tent, silence weighed heavy. A lone soldier knelt, helm pressed to the rug.</p>
-            <p>“Explain yourself,” Mo Yuan said.</p>
-            <p>“I… thought I should fight.”</p>
-            <p>“Fight? You broke the line. Who taught you to wield a sword?”</p>
-            <p>“…No one.”</p>
-            <p>Mo Yuan’s hand moved before his heart did. The command fan left his grip—<em>clang</em>—the helm rolled aside, and the world stopped. Xin Zhi looked up, eyes like quiet stars, a small smile already softening the bruise.</p>
-            <p>Mo Yuan’s voice thinned between anger and relief. “…I should have recognized you.”</p>
-            <p>Xin Zhi tilted his head. “…You threw that fan very hard.”</p>
-          </div>
         </div>
       </div>
     </section>
 
     <!-- Shelf -->
-    <section id="shelf" class="shelf">
+    <section id="shelf" class="panel">
       <div class="wrap">
-        <h2>Bookshelf</h2>
-        <p class="shelf-note">The shelf awaits future releases. For now, all incense burns for this volume.</p>
-        <div class="shelf-grid">
-          <article class="book-card">
-            <div class="spine"></div>
-            <img src="assets/end-of-two-souls-cover.png" alt="The End of Two Souls cover" />
-            <div class="info">
-              <h3>The End of Two Souls</h3>
-              <p>BL · Ongoing</p>
-              <a class="btn tiny" href="#book">Details</a>
-            </div>
-          </article>
-        </div>
+        <h2 class="h">Bookshelf</h2>
+        <p>The shelf awaits future releases. For now, all incense burns for this volume.</p>
       </div>
     </section>
 
     <!-- About -->
-    <section id="about" class="about">
-      <div class="wrap grid-2">
-        <div>
-          <h2 class="ornament">About Kunturia</h2>
-          <p>
-           I am a writer from the Philippines who focuses on fantasy, tragedy, and BL stories. 
-            Beyond writing, I am also an artist and a cosplayer, finding different ways to bring imagination into form.
-          </p>
-        </div>
-        <ul class="about-list">
-          <li><strong>Genres:</strong> BL, dark fantasy, romance</li>
-          <li><strong>Style:</strong> semi-old cultivation, layered scenes</li>
-          <li><strong>Current focus:</strong> <em>The End of Two Souls</em></li>
-        </ul>
+    <section id="about" class="panel">
+      <div class="wrap">
+        <h2 class="h">About Kunturia</h2>
+        <p class="about">
+          I am a writer from the Philippines who focuses on fantasy, tragedy, and BL stories. I’m also an artist and a
+          cosplayer—different ways I bring imagination into form. Expect soft petals, sharp steel, and vows that refuse to die.
+        </p>
       </div>
     </section>
 
-    <!-- Contact / Follow -->
-    <section id="contact" class="contact">
+    <!-- Contact + Music -->
+    <section id="contact" class="panel">
       <div class="wrap grid-2">
         <div>
-          <h2 class="ornament">Where to Read & Follow</h2>
-          <p>Follow on Wattpad for updates.</p>
-          <div class="links">
-            <a href="https://www.wattpad.com/user/Kunturia" target="_blank" class="link-row">Wattpad — @Kunturia</a>
-            <a href="https://twitter.com/ArturiaKun" target="_blank" class="link-row">Twitter — @ArturiaKun</a>
-            <a href="mailto:kunyawrites@gmail.com" class="link-row">Email — kunyawrites@gmail.com</a>
-          </div>
+          <h2 class="h" id="follow">Where to Read & Follow</h2>
+          <ul class="links">
+            <li><a href="https://www.wattpad.com/user/Kunturia" target="_blank" rel="noopener">Wattpad — @Kunturia</a></li>
+            <li><a href="https://x.com/ArturiaKun" target="_blank" rel="noopener">Twitter — @ArturiaKun</a></li>
+            <li><a href="mailto:kunyawrites@gmail.com">Email — kunyawrites@gmail.com</a></li>
+          </ul>
+          <p class="muted">No newsletter needed—just follow on Wattpad for updates.</p>
         </div>
+
         <div>
-          <h3 class="ornament">Background Music</h3>
+          <h2 class="h">Background Music</h2>
           <p>Xinzhi’s Melody of Snow and Lotus</p>
-
-          <!-- Autoplay after first gesture; button toggles -->
           <audio id="bgm" preload="auto" loop src="assets/bgm.mp3"></audio>
-          <button id="musicToggle" class="btn ghost" style="margin-top:8px">Play music</button>
-
-          <p class="small" style="color:var(--muted)">If autoplay is blocked, click anywhere or the button once.</p>
+          <button id="musicToggle" class="btn ghost">Play Xinzhi’s Theme (OST)</button>
+          <p class="muted small">If autoplay is blocked, click anywhere on the page or press the button once.</p>
         </div>
       </div>
     </section>
-  </main>
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="wrap">
-      <p>© <span id="year"></span> Kunturia</p>
-      <nav>
-        <a href="#book">Book</a>
-        <a href="#shelf">Shelf</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </div>
-  </footer>
+    <footer class="footer">
+      <div class="wrap tiny">
+        © <span id="year"></span> Kunturia. All rights reserved.
+      </div>
+    </footer>
+  </main>
 
   <script src="script.js"></script>
 </body>
