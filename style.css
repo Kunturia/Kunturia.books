@@ -15,14 +15,14 @@ img{max-width:100%;display:block}
 a{text-decoration:none;color:var(--ink)}
 .wrap{width:min(1100px,92%);margin:0 auto}
 
-/* Canvas sits behind and never blocks clicks */
-#butterfly {
+#butterfly{
   position: fixed;
   inset: 0;
-  z-index: 5;
-  pointer-events: none;
+  z-index: 5;          /* important: not -1 */
+  pointer-events: none;/* so it never blocks clicks */
   background: none;
 }
+
 
 
 /* ===== Header (kept dark for readability) ===== */
