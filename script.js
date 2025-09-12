@@ -1,10 +1,9 @@
-// ===== Ambient Canvas: Sakura + Snowflakes + Gold Sparks =====
+// ===== Canvas Ambience: Butterflies + Gold Sparks =====
 const canvas = document.getElementById('sakura');
 const ctx = canvas.getContext('2d');
 
 let W, H;
-let petals = [];
-let flakes = [];
+let butterflies = [];
 let sparks = [];
 
 function resize(){
@@ -14,90 +13,69 @@ function resize(){
 window.addEventListener('resize', resize);
 resize();
 
-/* --- Sakura petals --- */
-function makePetal(){
-  const size = Math.random()*10 + 6;
+/* --- Butterflies (from assets/butterfly.png) --- */
+const butterflyImg = new Image();
+let butterflyReady = false;
+butterflyImg.onload = () => (butterflyReady = true);
+butterflyImg.src = 'assets/butterfly.png';
+
+// Tweak these to taste
+const MAX_BUTTERFLIES = 14;   // how many on screen
+const SPAWN_CHANCE     = 0.015; // spawn probability per frame
+const SPEED_Y_RANGE    = [0.35, 0.9]; // upward speed
+const SIZE_RANGE       = [26, 44];    // px
+
+function rand(a,b){ return a + Math.random()*(b-a); }
+
+function makeButterfly(){
   return {
     x: Math.random()*W,
-    y: -20,
-    vx: Math.random()*0.6 - 0.3,
-    vy: Math.random()*0.8 + 0.6,
+    y: H + 40,                          // start off-screen bottom
+    size: rand(SIZE_RANGE[0], SIZE_RANGE[1]),
+    vx: (Math.random()-0.5)*0.5,        // gentle drift
+    vy: -rand(SPEED_Y_RANGE[0], SPEED_Y_RANGE[1]),
     rot: Math.random()*Math.PI*2,
     vr: (Math.random()-0.5)*0.02,
-    size,
-    sway: Math.random()*0.6 + 0.2,
-    alpha: Math.random()*0.3 + 0.6
+    sway: Math.random()*1.1,            // lateral wobble strength
+    phase: Math.random()*Math.PI*2      // desync their flaps/paths
   };
 }
-function drawPetal(p){
-  ctx.save();
-  ctx.translate(p.x, p.y);
-  ctx.rotate(p.rot);
-  const s = p.size;
-  const g = ctx.createRadialGradient(0,0,1, 0,0,s);
-  g.addColorStop(0, `rgba(255,184,200,${p.alpha})`);
-  g.addColorStop(1, `rgba(255,140,170,${p.alpha*0.85})`);
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.moveTo(0, -s*0.6);
-  ctx.bezierCurveTo(s, -s, s, s, 0, s*0.8);
-  ctx.bezierCurveTo(-s, s, -s, -s, 0, -s*0.6);
-  ctx.fill();
-  ctx.restore();
-}
 
-/* --- Snowflakes (pure canvas, no image) --- */
-function makeFlake(){
-  const r = Math.random()*2.3 + 1.2;
-  return {
-    x: Math.random()*W,
-    y: -12,
-    r,
-    vx: (Math.random()-0.5)*0.35,
-    vy: Math.random()*0.7 + 0.4,
-    swayPhase: Math.random()*Math.PI*2,
-    rot: Math.random()*Math.PI*2,
-    vr: (Math.random()-0.5)*0.01
-  };
-}
-function drawFlake(f, t){
-  // gentle horizontal sway
-  const sway = Math.sin(t*0.001 + f.swayPhase) * 0.6;
-  f.x += f.vx + sway*0.15;
-  f.y += f.vy;
-  f.rot += f.vr;
+function drawButterfly(b, t){
+  // update
+  b.x += b.vx + Math.sin(t*0.001 + b.phase)*b.sway*0.5;
+  b.y += b.vy;
+  b.rot += b.vr;
 
-  // simple six-armed flake + core
+  // draw
   ctx.save();
-  ctx.translate(f.x, f.y);
-  ctx.rotate(f.rot);
-  ctx.globalAlpha = 0.9;
-  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-  ctx.lineWidth = 1;
-  const L = f.r*2.2;
-  for(let i=0;i<3;i++){
-    ctx.beginPath();
-    ctx.moveTo(-L,0); ctx.lineTo(L,0);
-    ctx.stroke();
-    ctx.rotate(Math.PI/3);
+  ctx.translate(b.x, b.y);
+  ctx.rotate(Math.sin(t*0.005 + b.phase)*0.4); // subtle “flap” tilt
+  if (butterflyReady){
+    ctx.drawImage(butterflyImg, -b.size/2, -b.size/2, b.size, b.size);
+  } else {
+    // vector fallback if image hasn’t loaded yet
+    ctx.fillStyle = 'rgba(255,150,170,0.95)';
+    const w=b.size, h=b.size;
+    ctx.beginPath(); ctx.moveTo(0,0);
+    ctx.bezierCurveTo(-w*0.45,-h*0.6, -w*0.55,h*0.6, 0,0);
+    ctx.bezierCurveTo(w*0.45,-h*0.6,  w*0.55,h*0.6, 0,0);
+    ctx.fill();
+    ctx.fillStyle='rgba(212,175,55,0.9)'; ctx.fillRect(-2,-h*0.25,4,h*0.5);
   }
-  ctx.beginPath();
-  ctx.arc(0,0,f.r*0.6,0,Math.PI*2);
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.fill();
   ctx.restore();
 }
 
-/* --- Gold sparks (motes) --- */
+/* --- Gold sparks (tiny rising motes) --- */
 function makeSpark(){
   return {
     x: Math.random()*W,
-    y: Math.random()*H*0.85 + H*0.05,
-    vx: (Math.random()-0.5)*0.2,
-    vy: -(Math.random()*0.4 + 0.1),
-    life: Math.random()*120 + 80,
-    age: 0,
-    r: Math.random()*1.8 + 0.8
+    y: Math.random()*H*0.9,
+    vx:(Math.random()-0.5)*0.2,
+    vy: -(Math.random()*0.4+0.1),
+    life: Math.random()*120+80,
+    age:0,
+    r: Math.random()*1.5+0.6
   };
 }
 function drawSpark(s){
@@ -107,43 +85,29 @@ function drawSpark(s){
   ctx.shadowBlur = 10;
   ctx.shadowColor = 'rgba(212,175,55,.9)';
   ctx.beginPath();
-  ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+  ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
   ctx.fill();
   ctx.restore();
 }
 
 /* --- Main loop --- */
-let lastSpawn = 0;
-function tick(t){
+function tick(t=0){
   ctx.clearRect(0,0,W,H);
 
-  // spawn petals
-  if (t - lastSpawn > 40 && petals.length < 110){
-    petals.push(makePetal());
-    lastSpawn = t;
-  }
-  for (let i=petals.length-1; i>=0; i--){
-    const p = petals[i];
-    p.x += p.vx + Math.sin(t*0.001 + i)*p.sway*0.2;
-    p.y += p.vy;
-    p.rot += p.vr;
-    drawPetal(p);
-    if (p.y > H + 40) petals.splice(i,1);
+  // butterflies
+  if (Math.random() < SPAWN_CHANCE && butterflies.length < MAX_BUTTERFLIES)
+    butterflies.push(makeButterfly());
+
+  for (let i=butterflies.length-1; i>=0; i--){
+    const b = butterflies[i];
+    drawButterfly(b, t);
+    if (b.y < -60) butterflies.splice(i,1);
   }
 
-  // spawn flakes
-  if (Math.random() < 0.28 && flakes.length < 160) flakes.push(makeFlake());
-  for (let i=flakes.length-1; i>=0; i--){
-    const f = flakes[i];
-    drawFlake(f, t);
-    if (f.y > H + 20) flakes.splice(i,1);
-  }
-
-  // spawn sparks
-  if (Math.random() < 0.15 && sparks.length < 120) sparks.push(makeSpark());
-  for (let i=sparks.length-1; i>=0; i--){
-    const s = sparks[i];
-    s.x += s.vx; s.y += s.vy; s.age++;
+  // sparks
+  if (Math.random()<0.12 && sparks.length<120) sparks.push(makeSpark());
+  for (let i=sparks.length-1;i>=0;i--){
+    const s=sparks[i]; s.x+=s.vx; s.y+=s.vy; s.age++;
     drawSpark(s);
     if (s.age > s.life) sparks.splice(i,1);
   }
@@ -152,44 +116,22 @@ function tick(t){
 }
 requestAnimationFrame(tick);
 
-/* ===== UI bits ===== */
-document.getElementById('year').textContent = new Date().getFullYear();
+/* ===== UI bits (year, sample toggle, music toggle) ===== */
+const yEl = document.getElementById('year'); if (yEl) yEl.textContent = new Date().getFullYear();
 
-// Read Sample toggle
 const sampleBtn = document.getElementById('readSampleBtn');
 const sampleBox = document.getElementById('sampleBox');
-if (sampleBtn && sampleBox){
-  sampleBtn.addEventListener('click', () => sampleBox.classList.toggle('open'));
-}
+if(sampleBtn && sampleBox){ sampleBtn.addEventListener('click', () => sampleBox.classList.toggle('open')); }
 
-// Background music (autoplay after first gesture + toggle)
 const bgm = document.getElementById('bgm');
 const musicBtn = document.getElementById('musicToggle');
 if (bgm && musicBtn) {
   bgm.volume = 0.25;
-
-  const setBtn = () => {
-    // change the labels to your preferred wording if you like
-    musicBtn.textContent = bgm.paused ? 'Play Xinzhi’s Theme (OST)' : 'Pause Xinzhi’s Theme';
-  };
-
-  // Try to play immediately if allowed
+  const setBtn = () => musicBtn.textContent = bgm.paused ? 'Play Xinzhi’s Theme (OST)' : 'Pause Xinzhi’s Theme';
   bgm.play().then(setBtn).catch(setBtn);
-
-  // Start on first user interaction (for autoplay-blocking browsers)
-  const unlock = () => {
-    bgm.play().then(setBtn).catch(()=>{});
-    window.removeEventListener('pointerdown', unlock);
-    window.removeEventListener('keydown', unlock);
-    window.removeEventListener('touchstart', unlock);
-  };
-  window.addEventListener('pointerdown', unlock, { once:true });
-  window.addEventListener('keydown',   unlock, { once:true });
-  window.addEventListener('touchstart',unlock, { once:true });
-
-  // Manual toggle
-  musicBtn.addEventListener('click', () => {
-    if (bgm.paused) bgm.play().then(setBtn);
-    else { bgm.pause(); setBtn(); }
-  });
+  const unlock = () => { bgm.play().then(setBtn).catch(()=>{}); };
+  window.addEventListener('pointerdown', unlock, {once:true});
+  window.addEventListener('keydown', unlock, {once:true});
+  window.addEventListener('touchstart', unlock, {once:true});
+  musicBtn.addEventListener('click', () => { if (bgm.paused) bgm.play().then(setBtn); else { bgm.pause(); setBtn(); } });
 }
