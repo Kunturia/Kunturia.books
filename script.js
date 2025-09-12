@@ -7,6 +7,8 @@ let butterflies = [];
 let sparks = [];
 
 const butterflyImg = new Image();
+let butterflyReady = false;
+butterflyImg.onload = () => butterflyReady = true;
 butterflyImg.src = 'assets/butterfly.png';
 
 function resize(){
@@ -35,37 +37,29 @@ function drawPetal(p){
   ctx.restore();
 }
 
-function makeButterfly(){
-  return { x: Math.random()*W, y: H+30, vx: Math.random()*0.5-0.25, vy: -(Math.random()*0.8+0.6),
-           size: Math.random()*26+16, phase: Math.random()*Math.PI*2 };
-}
+function makeButterfly(){ return { x: Math.random()*W, y: H+30, vx: Math.random()*0.5-0.25, vy: -(Math.random()*0.8+0.6), size: Math.random()*26+16, phase: Math.random()*Math.PI*2 }; }
 function drawButterfly(b,t){
-  if(!butterflyImg.complete) return;
+  if(!butterflyReady) return;
   const flap = Math.sin(t*0.005 + b.phase)*0.2 + 1;
   const w = b.size*flap, h = b.size;
-  ctx.save(); ctx.translate(b.x,b.y); ctx.globalAlpha = 0.85;
+  ctx.save(); ctx.translate(b.x,b.y); ctx.globalAlpha = 0.9;
   ctx.drawImage(butterflyImg, -w/2, -h/2, w, h);
   ctx.restore(); ctx.globalAlpha = 1;
 }
 
-function makeSpark(){
-  return { x: Math.random()*W, y: Math.random()*H*0.8 + H*0.1,
-           vx:(Math.random()-0.5)*0.2, vy: -(Math.random()*0.4+0.1),
-           life: Math.random()*120+80, age:0, r: Math.random()*1.8+0.8 };
-}
+function makeSpark(){ return { x: Math.random()*W, y: Math.random()*H*0.8 + H*0.1, vx:(Math.random()-0.5)*0.2, vy: -(Math.random()*0.4+0.1), life: Math.random()*120+80, age:0, r: Math.random()*1.8+0.8 }; }
 function drawSpark(s){
   const a = 1 - s.age/s.life;
   ctx.save(); ctx.fillStyle = `rgba(212,175,55,${0.7*a})`;
   ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(212,175,55,.8)';
-  ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
+  ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); ctx.restore();
 }
 
 let last = 0;
 function tick(t){
   ctx.clearRect(0,0,W,H);
 
-  // spawn petals
+  // petals
   if(t - last > 40 && petals.length < 120){ petals.push(makePetal()); last = t; }
   for(let i=petals.length-1;i>=0;i--){
     const p=petals[i]; p.x += p.vx + Math.sin(t*0.001 + i)*p.sway*0.2; p.y+=p.vy; p.rot+=p.vr; drawPetal(p);
@@ -79,11 +73,10 @@ function tick(t){
     if(b.y < -50) butterflies.splice(i,1);
   }
 
-  // gold sparks (floating motes)
+  // sparks
   if(Math.random() < 0.15 && sparks.length < 120) sparks.push(makeSpark());
   for(let i=sparks.length-1;i>=0;i--){
-    const s = sparks[i]; s.x += s.vx; s.y += s.vy; s.age++;
-    drawSpark(s);
+    const s = sparks[i]; s.x += s.vx; s.y += s.vy; s.age++; drawSpark(s);
     if(s.age > s.life) sparks.splice(i,1);
   }
 
@@ -105,43 +98,24 @@ const sampleBox = document.getElementById('sampleBox');
 if(sampleBtn && sampleBox){
   sampleBtn.addEventListener('click', () => sampleBox.classList.toggle('open'));
 }
-// Read Sample toggle
-const sampleBtn = document.getElementById('readSampleBtn');
-const sampleBox = document.getElementById('sampleBox');
-if(sampleBtn && sampleBox){
-  sampleBtn.addEventListener('click', () => sampleBox.classList.toggle('open'));
-}
 
-// ===== Background music handling =====
+// ===== Background music handling (autoplay after first gesture) =====
 const bgm = document.getElementById('bgm');
 const musicBtn = document.getElementById('musicToggle');
 
 if (bgm && musicBtn) {
-  bgm.volume = 0.25; // softer
-  bgm.play().then(() => {
-    musicBtn.textContent = 'Pause music';
-  }).catch(() => {
-    musicBtn.textContent = 'Play music';
-  });
+  bgm.volume = 0.25;
 
-  const unlock = () => {
-    bgm.play().then(() => {
-      musicBtn.textContent = 'Pause music';
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('keydown', unlock);
-      window.removeEventListener('touchstart', unlock);
-    }).catch(() => {});
-  };
-  window.addEventListener('pointerdown', unlock, { once: true });
-  window.addEventListener('keydown', unlock, { once: true });
-  window.addEventListener('touchstart', unlock, { once: true });
+  const setBtn = () => musicBtn.textContent = bgm.paused ? 'Play music' : 'Pause music';
 
-  musicBtn.addEventListener('click', () => {
-    if (bgm.paused) {
-      bgm.play().then(() => musicBtn.textContent = 'Pause music');
-    } else {
-      bgm.pause();
-      musicBtn.textContent = 'Play music';
-    }
-  });
+  // try immediate
+  bgm.play().then(setBtn).catch(setBtn);
+
+  // unlock on first interaction if blocked
+  const unlock = () => { bgm.play().then(setBtn).catch(()=>{}); window.removeEventListener('pointerdown', unlock); window.removeEventListener('keydown', unlock); window.removeEventListener('touchstart', unlock); };
+  window.addEventListener('pointerdown', unlock, { once:true });
+  window.addEventListener('keydown',   unlock, { once:true });
+  window.addEventListener('touchstart',unlock, { once:true });
+
+  musicBtn.addEventListener('click', () => { if(bgm.paused) bgm.play().then(setBtn); else { bgm.pause(); setBtn(); } });
 }
