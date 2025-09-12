@@ -161,12 +161,14 @@
         </div>
         <div>
           <h3 class="ornament">Background Music</h3>
-          <p>Flute, erhu, and guqin ambience to read by.</p>
-          <!-- Autoplay loop; browsers may start after first click -->
-          <audio autoplay loop>
-            <source src="assets/bgm.mp3" type="audio/mpeg" />
-          </audio>
-          <p class="small" style="color:var(--muted)">If autoplay is blocked, music will begin after you click anywhere on the page.</p>
+      
+         <!-- Autoplay after first click/tap; manual toggle button shown -->
+<audio id="bgm" preload="auto" loop src="assets/bgm.mp3"></audio>
+<button id="musicToggle" class="btn ghost" style="margin-top:8px">Play music</button>
+<p class="small" style="color:var(--muted)">
+  If your browser blocks autoplay, click “Play music” once.
+</p>
+
         </div>
       </div>
     </section>
