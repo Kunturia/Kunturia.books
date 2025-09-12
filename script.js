@@ -1,23 +1,23 @@
-/* ===== FIRELIES (GOLD SPARKS) + music + sample toggle + scroll reveal ===== */
+/* ===== Gold fireflies + robust music + toggles + scroll reveal ===== */
 
-// ---- Canvas setup
-const canvas = document.getElementById('fireflies');
+// ---------- Ambient fireflies ----------
+const canvas = document.getElementById('ambient');
 const ctx = canvas.getContext('2d');
-function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
-addEventListener('resize', resize); resize();
 
-// ---- Fireflies
-const FIREFLIES_MAX = 120;
-const F = [];
-function makeFly(){
+function size() { canvas.width = innerWidth; canvas.height = innerHeight; }
+addEventListener('resize', size); size();
+
+const MAX_FIREFLIES = 110;
+const flies = [];
+function mkFly(){
   return {
     x: Math.random()*canvas.width,
     y: Math.random()*canvas.height,
     vx:(Math.random()-0.5)*0.12,
     vy:(Math.random()-0.5)*0.12,
-    r: Math.random()*1.6 + 0.8,
-    baseA: Math.random()*0.35 + 0.35,
-    tw: Math.random()*0.002 + 0.001,
+    r: Math.random()*1.5 + 0.8,
+    a: Math.random()*0.35 + 0.35,    // base alpha
+    tw: Math.random()*0.002 + 0.001, // twinkle speed
     ph: Math.random()*Math.PI*2
   };
 }
@@ -26,40 +26,65 @@ function drawFly(f, t){
   if (f.x < -10) f.x = canvas.width+10; else if (f.x > canvas.width+10) f.x = -10;
   if (f.y < -10) f.y = canvas.height+10; else if (f.y > canvas.height+10) f.y = -10;
 
-  const a = f.baseA * (0.55 + 0.45*Math.sin(t*f.tw + f.ph));
+  const alpha = f.a * (0.55 + 0.45*Math.sin(t*f.tw + f.ph));
   ctx.save();
-  ctx.globalAlpha = a;
+  ctx.globalAlpha = alpha;
   ctx.fillStyle = 'rgb(212,175,55)';
   ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(212,175,55,.9)';
-  ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI*2); ctx.fill();
   ctx.restore();
 }
 function loop(t=0){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  while (F.length < FIREFLIES_MAX) F.push(makeFly());
-  for (let i=0;i<F.length;i++) drawFly(F[i], t);
+  while (flies.length < MAX_FIREFLIES) flies.push(mkFly());
+  for (let i=0;i<flies.length;i++) drawFly(flies[i], t);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
-// ---- Sample toggle (starts open per your request)
-const sampleBtn = document.getElementById('readSampleBtn');
-const sampleBox = document.getElementById('sampleBox');
-if (sampleBtn && sampleBox){
-  sampleBtn.addEventListener('click', ()=> sampleBox.classList.toggle('open'));
+// ---------- Year ----------
+const y = document.getElementById('year');
+if (y) y.textContent = new Date().getFullYear();
+
+// ---------- Prologue & Sample toggles ----------
+function makeToggle(btnId, boxId, labels = ['Read','Hide']){
+  const btn = document.getElementById(btnId);
+  const box = document.getElementById(boxId);
+  if (!btn || !box) return;
+
+  const set = (open) => {
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? `${labels[1]} ${btn.textContent.replace(/^Read |Hide /,'')}` 
+                           : `${labels[0]} ${btn.textContent.replace(/^Read |Hide /,'')}`;
+  };
+
+  // start closed
+  box.hidden = true; set(false);
+
+  btn.addEventListener('click', () => {
+    box.hidden = !box.hidden;
+    set(!box.hidden);
+  });
 }
 
-// ---- Year
-const yEl = document.getElementById('year'); if (yEl) yEl.textContent = new Date().getFullYear();
+makeToggle('prologueBtn','prologueBox');
+makeToggle('sampleBtn','sampleBox');
 
-// ---- Music (robust)
+// ---------- Music (robust) ----------
 const bgm = document.getElementById('bgm');
 const musicBtn = document.getElementById('musicToggle');
+
 if (bgm && musicBtn){
   bgm.volume = 0.25;
-  const setBtn = () => musicBtn.textContent = bgm.paused ? 'Play Xinzhi’s Theme (OST)' : 'Pause Xinzhi’s Theme';
-  bgm.play().then(setBtn).catch(setBtn);
-  const unlock = () => { bgm.play().then(setBtn).catch(()=>{}); cleanup(); };
+
+  function sync(){
+    musicBtn.textContent = bgm.paused ? 'Play Xinzhi’s Theme (OST)' : 'Pause Xinzhi’s Theme';
+    musicBtn.setAttribute('aria-pressed', String(!bgm.paused));
+  }
+
+  bgm.play().then(sync).catch(sync); // attempt autoplay
+
+  const unlock = () => { bgm.play().then(sync).catch(()=>{}); cleanup(); };
   const cleanup = () => {
     window.removeEventListener('pointerdown', unlock);
     window.removeEventListener('keydown', unlock);
@@ -68,10 +93,13 @@ if (bgm && musicBtn){
   window.addEventListener('pointerdown', unlock, { once:true });
   window.addEventListener('keydown',   unlock, { once:true });
   window.addEventListener('touchstart',unlock, { once:true });
-  musicBtn.addEventListener('click', () => { if (bgm.paused) bgm.play().then(setBtn); else { bgm.pause(); setBtn(); } });
+
+  musicBtn.addEventListener('click', () => {
+    if (bgm.paused) bgm.play().then(sync); else { bgm.pause(); sync(); }
+  });
 }
 
-// ---- Reveal on scroll
+// ---------- Reveal on scroll ----------
 const reveals = document.querySelectorAll('.reveal');
 const io = new IntersectionObserver((entries)=>{
   for (const e of entries){
@@ -81,5 +109,5 @@ const io = new IntersectionObserver((entries)=>{
       io.unobserve(e.target);
     }
   }
-},{ rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+},{rootMargin:'0px 0px -10% 0px', threshold:0.1});
 reveals.forEach(el => io.observe(el));
