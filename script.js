@@ -1,9 +1,9 @@
-// ===== Canvas Ambience: Butterflies + Gold Sparks =====
-const canvas = document.getElementById('sakura');
+// ===== Canvas Ambience: Butterfly + Gold Sparks =====
+const canvas = document.getElementById('butterfly');
 const ctx = canvas.getContext('2d');
 
 let W, H;
-let butterflies = [];
+let butterfly = [];
 let sparks = [];
 
 function resize(){
@@ -13,14 +13,14 @@ function resize(){
 window.addEventListener('resize', resize);
 resize();
 
-/* --- Butterflies (from assets/butterfly.png) --- */
+/* --- Butterfly (from assets/butterfly.png) --- */
 const butterflyImg = new Image();
 let butterflyReady = false;
 butterflyImg.onload = () => (butterflyReady = true);
 butterflyImg.src = 'assets/butterfly.png';
 
 // Tweak these to taste
-const MAX_BUTTERFLIES = 14;   // how many on screen
+const MAX_BUTTERFLY = 14;   // how many on screen
 const SPAWN_CHANCE     = 0.015; // spawn probability per frame
 const SPEED_Y_RANGE    = [0.35, 0.9]; // upward speed
 const SIZE_RANGE       = [26, 44];    // px
@@ -94,14 +94,14 @@ function drawSpark(s){
 function tick(t=0){
   ctx.clearRect(0,0,W,H);
 
-  // butterflies
-  if (Math.random() < SPAWN_CHANCE && butterflies.length < MAX_BUTTERFLIES)
+  // butterfly
+  if (Math.random() < SPAWN_CHANCE && butterfly.length < MAX_BUTTERFLIES)
     butterflies.push(makeButterfly());
 
-  for (let i=butterflies.length-1; i>=0; i--){
-    const b = butterflies[i];
+  for (let i=butterfly.length-1; i>=0; i--){
+    const b = butterfly[i];
     drawButterfly(b, t);
-    if (b.y < -60) butterflies.splice(i,1);
+    if (b.y < -60) butterfly.splice(i,1);
   }
 
   // sparks
