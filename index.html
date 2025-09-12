@@ -4,15 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kunturia — The End of Two Souls</title>
-  <meta name="description" content="Official site for Kunturia’s BL novel The End of Two Souls. Red–gold ambience, fireflies, bookshelf, and music." />
+  <meta name="description" content="Official site for Kunturia’s BL novel The End of Two Souls. Red–gold ambience, fireflies, bookshelf, music, and samples." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body id="top">
-  <!-- Background canvas (fireflies) -->
-  <canvas id="fireflies"></canvas>
+  <!-- Ambient background -->
+  <canvas id="ambient"></canvas>
 
   <!-- Header -->
   <header class="site-header">
@@ -29,7 +29,7 @@
   </header>
 
   <main>
-    <!-- Hero / Book -->
+    <!-- Hero -->
     <section id="book" class="panel hero reveal">
       <div class="wrap hero-grid">
         <div class="hero-text">
@@ -40,7 +40,7 @@
           </p>
           <div class="btns">
             <a class="btn" href="#details">View Details</a>
-            <a class="btn ghost" href="#follow">Follow Updates</a>
+            <a class="btn ghost" href="https://www.wattpad.com/user/Kunturia" target="_blank" rel="noopener">Follow on Wattpad</a>
           </div>
         </div>
         <figure class="cover">
@@ -49,7 +49,7 @@
       </div>
     </section>
 
-    <!-- Details / Description / Prologue / Sample -->
+    <!-- Details -->
     <section id="details" class="panel reveal" data-delay="80">
       <div class="wrap">
         <h2 class="h">About the Book</h2>
@@ -78,8 +78,9 @@
 
         <!-- Prologue -->
         <h3 class="h thin">Prologue — The End of Two Souls</h3>
-        <button id="readPrologueBtn" class="btn small">Read / Hide Prologue</button>
-        <div id="prologueBox" class="sample prose">
+        <button id="prologueBtn" class="btn small" aria-controls="prologueBox" aria-expanded="false">Read Prologue</button>
+        <div id="prologueBox" class="sample prose" hidden>
+          <!-- PROLOGUE TEXT -->
           <p><em>The End of Two Halves</em></p>
           <p>In the year of the 1800s, when the war between the celestial gods and demonic lords reached its peak, two figures stood at the eye of the storm, locked in a battle not just for dominion, but for destiny.</p>
           <p>One man, adorned with divine radiance like a faint golden crown hovering above him, pointed a gleaming holy sword at the throat of the other.</p>
@@ -115,84 +116,47 @@
 
         <!-- Sample -->
         <h3 class="h thin" style="margin-top:18px">Sample</h3>
-        <button id="readSampleBtn" class="btn small">Read / Hide Sample</button>
-        <div id="sampleBox" class="sample prose">
+        <button id="sampleBtn" class="btn small" aria-controls="sampleBox" aria-expanded="false">Read Sample</button>
+        <div id="sampleBox" class="sample prose" hidden>
+          <!-- SAMPLE TEXT -->
           <p><em>The years had not been kind to Xin Zhi.</em></p>
-
           <p>In the Heavenly Court, whispers followed him wherever he went.</p>
-
           <p>“He’s a weak god…”</p>
           <p>“Only knows how to heal scratches…”</p>
           <p>“A candle in the wind—better snuffed out than sheltered.”</p>
-
           <p>Xin Zhi smiled softly, as he always did, and let the words pass through him like rain on stone. His days were spent in quiet routines—healing the injured, tending to mortal prayers, and walking in the gardens with Emperor Rui, the only friend who offered him a fragment of warmth. Rui’s fondness had grown beyond mere friendship, though Xin Zhi, gentle and unassuming, never pressed to understand it.</p>
-
           <p>But Rui was no longer his own man. Strings pulled from the shadows dictated his every move, and one day, those strings tightened into a noose for Xin Zhi.</p>
-
           <p>Without warning, a decree was issued: Xin Zhi was to join the battlefield.</p>
-
-          <p>No explanation.</p>
-          <p>No protest.</p>
-          <p>And Xin Zhi… accepted.</p>
-
+          <p>No explanation.</p><p>No protest.</p><p>And Xin Zhi… accepted.</p>
           <p>Perhaps, deep down, he had always expected this.</p>
-
           <p>The mortal realm was chaos incarnate.</p>
-
           <p>Demons erupted from the cracked earth like a plague, their roars shaking the mountains. Soldiers clashed steel against claw, and banners were swallowed by smoke. Amid the frenzy, a junior soldier stumbled onto the frontline, armored robes ill-fitted, face hidden behind a polished metal helm.</p>
-
           <p>It was Xin Zhi.</p>
-
           <p>He was meant to serve as a healer—Mo Yuan himself had requested one for the legions—but no one had told Xin Zhi his role. Seeing soldiers charge forward, he simply followed, believing that was his duty. If death awaited him in the frontlines, he would accept that too.</p>
-
           <p>From afar, Mo Yuan—commanding the Five Legions—caught sight of him.</p>
-
           <p>The soldier’s sword swings were clumsy and far too wide. He tripped over corpses, nearly stabbed an ally, and at one point, managed to decapitate a demon that was already dead. To Mo Yuan, the display was not only maddening—it was deadly.</p>
-
           <p>The formation faltered, the flank broke, and the demons surged in. When the raid finally ended, the ground was soaked with blood, and the soldiers’ eyes were heavy with grief.</p>
-
           <p>Mo Yuan’s fury simmered like a silent storm.</p>
-
           <p>The command tent was suffocating in its stillness.</p>
-
           <p>A lone soldier knelt on the rug, metal helm pressed to the floor in shame. Mo Yuan loomed over him, voice cold and sharp.</p>
-
           <p>“Explain yourself.”</p>
-
           <p>“I… I thought I was supposed to fight…” The voice was soft, uncertain.</p>
-
           <p>“Fight?” Mo Yuan’s tone rose, a low rumble of restrained rage. “You cost me soldiers’ lives today. You broke the line. Who taught you to wield a sword?”</p>
-
           <p>“…No one,” came the whisper.</p>
-
           <p>The words only twisted the knife in Mo Yuan’s chest. He reached for his folded fan—an emblem of command—and in a flash of anger, he hurled it at the soldier’s head.</p>
-
           <p><em>Clang!</em></p>
-
           <p>The helm fell away, rolling across the floor.</p>
-
           <p>Mo Yuan froze. His breath caught, and the world seemed to still.</p>
-
           <p>Kneeling before him, face streaked with dust and sweat, was Xin Zhi.</p>
-
           <p>Eyes like quiet stars lifted to meet his, shimmering with unshed tears. And then—unbelievably—Xin Zhi smiled, soft and forgiving, as if the fan had not struck him, as if the entire world had not just tried to crush him.</p>
-
           <p>Mo Yuan’s heart twisted. He had longed for this moment for years—longed to stand before Xin Zhi as his equal, as his protector. He had trained, bled, and endured countless battles to become strong enough to face him.</p>
-
           <p>And the first time fate placed them together… he had hurt him.</p>
-
           <p>Xin Zhi’s voice was gentle, almost timid.</p>
-
           <p>“…I’m sorry. I must have caused you trouble.”</p>
-
           <p>Mo Yuan’s hands curled into fists. Words stuck in his throat—grief, guilt, relief, and the sharp pain of recognition. He had imagined their reunion as something proud, something noble. Instead, it was this: Xin Zhi kneeling before him in disgrace, smiling through the sting of his tears.</p>
-
           <p>Mo Yuan dropped to one knee, his voice low, rough.</p>
-
           <p>“…I… should have recognized you.”</p>
-
           <p>Xin Zhi blinked, tilting his head slightly, still smiling. “…You threw that fan really hard.”</p>
-
           <p>Mo Yuan’s lips trembled between a frown and a smile. He had spent years building himself into a wall of iron and command, and in a single moment, Xin Zhi had cracked him open with nothing but a smile.</p>
         </div>
       </div>
@@ -219,8 +183,7 @@
       <div class="wrap">
         <h2 class="h">About Kunturia</h2>
         <p class="about">
-          I am a writer from the Philippines who focuses on fantasy, tragedy, and BL stories.
-          Beyond writing, I am also an artist and a cosplayer, finding different ways to bring imagination into form.
+          I am a writer from the Philippines who focuses on fantasy, tragedy, and BL stories. Beyond writing, I am also an artist and a cosplayer, finding different ways to bring imagination into form.
         </p>
       </div>
     </section>
@@ -242,7 +205,7 @@
           <h2 class="h">Background Music</h2>
           <p>Xinzhi’s Melody of Snow and Lotus</p>
           <audio id="bgm" preload="auto" loop src="assets/bgm.mp3"></audio>
-          <button id="musicToggle" class="btn ghost">Play Xinzhi’s Theme (OST)</button>
+          <button id="musicToggle" class="btn ghost" aria-pressed="false">Play Xinzhi’s Theme (OST)</button>
           <p class="muted small">If autoplay is blocked, click anywhere on the page or press the button once.</p>
         </div>
       </div>
@@ -255,17 +218,6 @@
     </footer>
   </main>
 
-  <!-- Scripts -->
   <script src="script.js"></script>
-  <script>
-    /* extra tiny glue so both toggles work even if you keep your existing script */
-    const proBtn = document.getElementById('readPrologueBtn');
-    const proBox = document.getElementById('prologueBox');
-    if (proBtn && proBox) proBtn.addEventListener('click', () => proBox.classList.toggle('open'));
-
-    const smpBtn = document.getElementById('readSampleBtn');
-    const smpBox = document.getElementById('sampleBox');
-    if (smpBtn && smpBox) smpBtn.addEventListener('click', () => smpBox.classList.toggle('open'));
-  </script>
 </body>
 </html>
