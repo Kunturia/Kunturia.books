@@ -1,105 +1,118 @@
-/* ===== THEME — Sacred Red + Gold, improved contrast ===== */
+/* ===== Palette: black base + crimson panels + gold accents ===== */
 :root{
-  --bg:#7b1113;          /* deep crimson */
-  --panel:#a52324;       /* brighter panel for contrast */
-  --ink:#fff7ec;         /* parchment */
-  --muted:#f6dfcf;       /* soft rose-gold */
+  --bg:#0b0b0f;          /* site background = black */
+  --panel:#7b1113;       /* crimson panel */
+  --ink:#f5f5f6;         /* near-white text */
+  --muted:#e9d7c6;       /* warm muted text */
   --accent:#d4af37;      /* gold */
-  --line:rgba(0,0,0,.25);/* darker line for separation */
+  --line:rgba(0,0,0,.35);/* separators */
 }
 
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 img{max-width:100%;display:block}
 a{text-decoration:none;color:var(--ink)}
 .wrap{width:min(1100px,92%);margin:0 auto}
 
-/* Lotus watermark background */
-body{
-  background: var(--bg) url('assets/lotus.png') repeat;
-  background-size: 260px;
-}
-
-/* Canvas behind all, never blocks clicks */
+/* Canvas sits behind and never blocks clicks */
 #sakura{
   position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background: radial-gradient(1200px 500px at 50% -10%, rgba(255,255,255,.08), transparent 60%);
+  background: radial-gradient(1200px 500px at 50% -10%, rgba(255,255,255,.06), transparent 60%);
 }
 
-/* Header */
-.site-header{position:sticky;top:0;backdrop-filter:blur(10px);
-  background:rgba(70,6,8,.65);border-bottom:1px solid var(--line);z-index:50}
+/* ===== Header (kept dark for readability) ===== */
+.site-header{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+  background:rgba(10,10,14,.6);border-bottom:1px solid rgba(255,255,255,.06)}
 .site-header .wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
 .brand{font-weight:700;letter-spacing:.5px}
 .nav a{margin-left:18px;font-size:14px;color:var(--muted)}
 .nav a:hover{color:var(--ink)}
 
-/* Hero */
-.hero{padding:56px 0 32px;border-bottom:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(212,175,55,.15), transparent 55%)}
+/* ===== Section “framed crimson panel” look ===== */
+.hero,.spotlight,.shelf,.about,.contact{
+  position:relative;
+  padding:56px 0 40px;
+  margin:24px 0;
+  border-radius:18px;
+  border:1px solid rgba(212,175,55,.45);        /* gold frame */
+  background:var(--panel);
+  box-shadow:0 18px 40px rgba(0,0,0,.45);
+  overflow:hidden;
+}
+/* faint lotus watermark inside panel */
+.hero::before,.spotlight::before,.shelf::before,.about::before,.contact::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:url('assets/lotus.png') repeat; background-size:240px;
+  opacity:.10; mix-blend-mode:screen;           /* very subtle */
+}
+/* gold strips along top & bottom */
+.hero::after,.spotlight::after,.shelf::after,.about::after,.contact::after{
+  content:""; position:absolute; left:0; right:0; height:10px; pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(212,175,55,.75), transparent);
+  top:0; box-shadow:0 100vh 0 -100vh rgba(212,175,55,.75); /* clones strip at bottom */
+}
+
+/* ===== Hero internals ===== */
 .hero-inner{display:grid;gap:28px;align-items:center;grid-template-columns:1.1fr .9fr}
-.title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(36px,6vw,68px);line-height:1.05;text-shadow:0 2px 4px rgba(0,0,0,.4)}
-.subtitle{font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.04em;color:#fff3d6;margin-top:6px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.blurb{margin-top:12px;color:#ffe9cf;max-width:56ch;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(36px,6vw,68px);line-height:1.05;
+  text-shadow:0 2px 4px rgba(0,0,0,.55)}
+.subtitle{font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.04em;color:#ffeccc;margin-top:6px;
+  text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.blurb{margin-top:12px;color:var(--muted);max-width:56ch;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .cta-row{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
-.hero-art{border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45);border:1px solid var(--line)}
+.hero-art{border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55);border:1px solid var(--line)}
 .hero-art img{width:100%;height:auto}
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:12px;border:1px solid var(--line);font-weight:700}
 .btn.primary{background:linear-gradient(180deg,var(--accent),#b88c1f);color:#2b1700;border-color:#7a5a10}
 .btn.primary:hover{filter:brightness(1.05)}
-.btn.ghost{background:rgba(255,255,255,.12);color:var(--ink);border-color:rgba(0,0,0,.3)}
+.btn.ghost{background:rgba(255,255,255,.10);color:var(--ink);border-color:rgba(255,255,255,.15)}
 .btn.tiny{font-size:12px;padding:6px 10px}
 
-/* Cards & sections */
-.spotlight{padding:48px 0;border-bottom:1px solid var(--line)}
+/* Book spotlight cards */
 .grid{display:grid;gap:20px;grid-template-columns:.95fr 1.05fr;align-items:stretch}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.card{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
 .card.cover img{border-radius:10px;height:100%;object-fit:cover}
-.card.detail h2{font-family:'Cormorant Garamond',serif;font-size:32px;margin:0 0 4px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.meta{color:#ffe5c2;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.card.detail h2{font-family:'Cormorant Garamond',serif;font-size:32px;margin:0 0 4px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.meta{color:#ffe5c2;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.45)}
 .desc{margin:10px 0 12px;color:var(--ink)}
 .facts{padding-left:18px;margin:0 0 14px;color:#ffe5c2}
 .facts li{margin:6px 0}
 
-/* Book shelf */
-.shelf{padding:40px 0;border-bottom:1px solid var(--line)}
-.shelf h2{font-family:'Cormorant Garamond',serif;font-size:34px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.shelf-note{color:#ffe5c2;margin-bottom:16px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+/* Shelf */
+.shelf h2{font-family:'Cormorant Garamond',serif;font-size:34px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.shelf-note{color:#ffe5c2;margin-bottom:16px;text-shadow:0 1px 2px rgba(0,0,0,.55)}
 .shelf-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .book-card{position:relative;overflow:hidden;border:1px solid var(--line);
-  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.05));border-radius:16px;padding:12px}
-.book-card .spine{position:absolute;left:0;top:0;bottom:0;width:10px;background:linear-gradient(90deg,rgba(212,175,55,.8),transparent)}
-.book-card img{border-radius:8px;aspect-ratio:3/4;width:100%;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.12));border-radius:16px;padding:12px}
+.book-card .spine{position:absolute;left:0;top:0;bottom:0;width:10px;background:linear-gradient(90deg,rgba(212,175,55,.9),transparent)}
+.book-card img{border-radius:8px;aspect-ratio:3/4;width:100%;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,.55)}
 .book-card .info{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
 .book-card h3{font-size:16px;margin:0}
 .book-card p{margin:0;color:#ffe5c2;font-size:13px}
 
 /* About */
-.about{padding:40px 0;border-bottom:1px solid var(--line)}
 .grid-2{display:grid;gap:18px;grid-template-columns:1fr 1fr}
-.about-list{list-style:none;padding:0;margin:0;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.about-list{list-style:none;padding:0;margin:0;border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.22)}
 .about-list li{padding:12px 14px;border-bottom:1px solid var(--line)}
 .about-list li:last-child{border-bottom:none}
 .ornament{display:inline-flex;align-items:center;gap:8px}
-.ornament:before{content:"";width:20px;height:20px;background:url('assets/lotus.png') no-repeat center/contain;filter:drop-shadow(0 0 2px rgba(0,0,0,.2))}
+.ornament:before{content:"";width:20px;height:20px;background:url('assets/lotus.png') no-repeat center/contain;filter:drop-shadow(0 0 2px rgba(0,0,0,.4))}
 
 /* Contact */
-.contact{padding:40px 0 64px}
-.subscribe{display:flex;gap:10px;flex-wrap:wrap}
-.subscribe input{flex:1;min-width:220px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.18);color:var(--ink)}
-.link-row{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--panel);color:#ffe5c2}
+.link-row{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:rgba(0,0,0,.22);color:#ffe5c2}
 .link-row:hover{color:var(--ink)}
 
 /* Footer */
-.site-footer{border-top:1px solid var(--line);padding:18px 0 32px;color:#ffe5c2}
+.site-footer{padding:18px 0 32px;color:#c8bfb5}
 .site-footer .wrap{display:flex;align-items:center;justify-content:space-between}
-.site-footer nav a{margin-left:14px;color:#ffe5c2}
+.site-footer nav a{margin-left:14px;color:#c8bfb5}
 .site-footer nav a:hover{color:var(--ink)}
 
 /* Read Sample box */
-.sample{display:none;margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.18)}
+.sample{display:none;margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.22)}
 .sample.open{display:block}
 .sample h3{margin-top:0;font-family:'Cormorant Garamond',serif}
 
@@ -107,6 +120,3 @@ body{
 @media (max-width:900px){
   .hero-inner,.grid,.grid-2{grid-template-columns:1fr}
 }
-
-/* A11y */
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
