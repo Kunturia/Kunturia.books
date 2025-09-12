@@ -1,82 +1,107 @@
-// Sakura petal animation on canvas (lightweight)
+// ===== Canvas ambience: sakura + butterflies (image) + gold sparks =====
 const canvas = document.getElementById('sakura');
 const ctx = canvas.getContext('2d');
-let W, H, petals;
+let W, H;
+let petals = [];
+let butterflies = [];
+let sparks = [];
+
+const butterflyImg = new Image();
+butterflyImg.src = 'assets/butterfly.png';
 
 function resize(){
   W = canvas.width = window.innerWidth;
   H = canvas.height = window.innerHeight;
-  petals = petals || [];
 }
-window.addEventListener('resize', resize);
-resize();
+window.addEventListener('resize', resize); resize();
 
 function makePetal(){
-  // Each petal is a bezier-ish rotated ellipse
   const size = Math.random()*10 + 6;
-  return {
-    x: Math.random()*W,
-    y: -20,
-    vx: Math.random()*0.6 - 0.3,
-    vy: Math.random()*0.8 + 0.6,
-    rot: Math.random()*Math.PI*2,
-    vr: (Math.random()-0.5)*0.02,
-    size,
-    sway: Math.random()*0.6 + 0.2,
-    alpha: Math.random()*0.3 + 0.5
-  };
+  return { x: Math.random()*W, y: -20, vx: Math.random()*0.6 - 0.3, vy: Math.random()*0.8 + 0.6,
+           rot: Math.random()*Math.PI*2, vr:(Math.random()-0.5)*0.02, size, sway:Math.random()*0.6+0.2, alpha:Math.random()*0.3+0.5 };
 }
-
 function drawPetal(p){
-  ctx.save();
-  ctx.translate(p.x, p.y);
-  ctx.rotate(p.rot);
+  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
   const s = p.size;
-  // soft rose color with subtle gradient
-  const grd = ctx.createRadialGradient(0,0,1, 0,0,s);
-  grd.addColorStop(0, `rgba(255, 184, 200, ${p.alpha})`);
-  grd.addColorStop(1, `rgba(255, 140, 170, ${p.alpha*0.85})`);
-  ctx.fillStyle = grd;
+  const g = ctx.createRadialGradient(0,0,1,0,0,s);
+  g.addColorStop(0,`rgba(255,184,200,${p.alpha})`);
+  g.addColorStop(1,`rgba(255,140,170,${p.alpha*0.85})`);
+  ctx.fillStyle = g;
   ctx.beginPath();
-  ctx.moveTo(0, -s*0.6);
-  ctx.bezierCurveTo(s, -s, s, s, 0, s*0.8);
-  ctx.bezierCurveTo(-s, s, -s, -s, 0, -s*0.6);
+  ctx.moveTo(0,-s*0.6);
+  ctx.bezierCurveTo(s,-s,s,s,0,s*0.8);
+  ctx.bezierCurveTo(-s,s,-s,-s,0,-s*0.6);
   ctx.fill();
   ctx.restore();
 }
 
-let lastSpawn = 0;
+function makeButterfly(){
+  return { x: Math.random()*W, y: H+30, vx: Math.random()*0.5-0.25, vy: -(Math.random()*0.8+0.6),
+           size: Math.random()*26+16, phase: Math.random()*Math.PI*2 };
+}
+function drawButterfly(b,t){
+  if(!butterflyImg.complete) return;
+  const flap = Math.sin(t*0.005 + b.phase)*0.2 + 1;
+  const w = b.size*flap, h = b.size;
+  ctx.save(); ctx.translate(b.x,b.y); ctx.globalAlpha = 0.85;
+  ctx.drawImage(butterflyImg, -w/2, -h/2, w, h);
+  ctx.restore(); ctx.globalAlpha = 1;
+}
+
+function makeSpark(){
+  return { x: Math.random()*W, y: Math.random()*H*0.8 + H*0.1,
+           vx:(Math.random()-0.5)*0.2, vy: -(Math.random()*0.4+0.1),
+           life: Math.random()*120+80, age:0, r: Math.random()*1.8+0.8 };
+}
+function drawSpark(s){
+  const a = 1 - s.age/s.life;
+  ctx.save(); ctx.fillStyle = `rgba(212,175,55,${0.7*a})`;
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(212,175,55,.8)';
+  ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+let last = 0;
 function tick(t){
   ctx.clearRect(0,0,W,H);
 
-  // spawn
-  if(t - lastSpawn > 40 && (petals?.length||0) < 120){
-    petals.push(makePetal());
-    lastSpawn = t;
+  // spawn petals
+  if(t - last > 40 && petals.length < 120){ petals.push(makePetal()); last = t; }
+  for(let i=petals.length-1;i>=0;i--){
+    const p=petals[i]; p.x += p.vx + Math.sin(t*0.001 + i)*p.sway*0.2; p.y+=p.vy; p.rot+=p.vr; drawPetal(p);
+    if(p.y > H+40) petals.splice(i,1);
   }
 
-  // update & draw
-  for(let i=petals.length-1;i>=0;i--){
-    const p = petals[i];
-    p.x += p.vx + Math.sin(t*0.001 + i)*p.sway*0.2;
-    p.y += p.vy;
-    p.rot += p.vr;
-    drawPetal(p);
-    if(p.y > H + 40) petals.splice(i,1);
+  // butterflies
+  if(Math.random() < 0.02 && butterflies.length < 30) butterflies.push(makeButterfly());
+  for(let i=butterflies.length-1;i>=0;i--){
+    const b = butterflies[i]; b.x += b.vx + Math.sin(t*0.002 + i)*0.5; b.y += b.vy; drawButterfly(b,t);
+    if(b.y < -50) butterflies.splice(i,1);
+  }
+
+  // gold sparks (floating motes)
+  if(Math.random() < 0.15 && sparks.length < 120) sparks.push(makeSpark());
+  for(let i=sparks.length-1;i>=0;i--){
+    const s = sparks[i]; s.x += s.vx; s.y += s.vy; s.age++;
+    drawSpark(s);
+    if(s.age > s.life) sparks.splice(i,1);
   }
 
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
 
-// Subscribe stub
+// ===== UI bits =====
 function subscribe(e){
   e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  if(!email) return;
-  alert('Subscribed: ' + email + '\nReplace this with your real email service later.');
+  alert('Follow on Wattpad instead of email — see links below.');
   e.target.reset();
 }
-
-// Year
 document.getElementById('year').textContent = new Date().getFullYear();
+
+// Read Sample toggle
+const sampleBtn = document.getElementById('readSampleBtn');
+const sampleBox = document.getElementById('sampleBox');
+if(sampleBtn && sampleBox){
+  sampleBtn.addEventListener('click', () => sampleBox.classList.toggle('open'));
+}
