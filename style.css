@@ -10,12 +10,10 @@
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 
-/* canvas sits above panels but never blocks clicks */
-#fireflies{
-  position:fixed; inset:0; z-index:5; pointer-events:none; background:none;
-}
+/* canvas above panels but non-interactive */
+#fireflies{position:fixed;inset:0;z-index:5;pointer-events:none;background:none}
 
 /* header */
 .site-header{
@@ -29,11 +27,9 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 .nav a:hover{color:var(--accent)}
 
 /* panels */
-.panel{
-  position:relative; margin:24px 0; padding:28px 0; overflow:hidden;
-}
-.panel::before{ /* subtle lotus watermark */
-  content:""; position:absolute; inset:0; opacity:.08; pointer-events:none;
+.panel{position:relative;margin:24px 0;padding:28px 0;overflow:hidden}
+.panel::before{
+  content:"";position:absolute;inset:0;opacity:.08;pointer-events:none;
   background:
     radial-gradient(1000px 400px at 50% -10%, rgba(255,255,255,.06), transparent 60%),
     url("assets/lotus.png");
@@ -41,47 +37,49 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background-repeat: repeat, repeat;
   background-position: center, center;
 }
-.panel > .wrap{position:relative; z-index:1;
-  background:var(--panel); border:1px solid var(--line);
-  box-shadow: 0 0 0 2px rgba(212,175,55,.15) inset, 0 16px 32px rgba(0,0,0,.45);
-  border-radius:14px; padding:28px;
+.panel > .wrap{
+  position:relative;z-index:1;background:var(--panel);border:1px solid var(--line);
+  box-shadow:0 0 0 2px rgba(212,175,55,.15) inset, 0 16px 32px rgba(0,0,0,.45);
+  border-radius:14px;padding:28px;
 }
 
 /* type */
 .h{font-family:"Cormorant Garamond",serif;font-size:28px;margin:0 0 14px}
+.h.thin{font-weight:600}
 .title{font-family:"Cormorant Garamond",serif;font-size:58px;line-height:1.05;margin:0 0 10px;text-shadow:0 2px 12px rgba(0,0,0,.4)}
 .subtitle{font-size:18px;color:var(--muted);margin:0 0 12px}
 .lead{max-width:52ch}
-
-.bullets{margin:12px 0 18px 18px}
-.bullets li{margin:6px 0}
-
 .meta{color:var(--muted);margin:6px 0 12px}
 .about{max-width:60ch}
-
 .muted{color:var(--muted)}
 .small{font-size:14px}
 .tiny{font-size:12px}
 
 /* hero grid */
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:center}
-@media (max-width:880px){
-  .hero-grid{grid-template-columns:1fr;gap:16px}
-  .cover{order:-1}
-}
+@media (max-width:880px){.hero-grid{grid-template-columns:1fr;gap:16px}.cover{order:-1}}
 .cover img{display:block;width:100%;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.5)}
 
 /* buttons */
-.btn{display:inline-block; padding:10px 16px; border-radius:10px; text-decoration:none; color:var(--bg);
-  background:linear-gradient(#f8e6a8,#d7b955); border:1px solid rgba(0,0,0,.2);
-  box-shadow:0 3px 10px rgba(0,0,0,.25); font-weight:600; margin-right:10px}
+.btn{display:inline-block;padding:10px 16px;border-radius:10px;text-decoration:none;color:var(--bg);
+  background:linear-gradient(#f8e6a8,#d7b955);border:1px solid rgba(0,0,0,.2);
+  box-shadow:0 3px 10px rgba(0,0,0,.25);font-weight:600;margin-right:10px}
 .btn:hover{filter:brightness(1.06)}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.2)}
 .btn.small{padding:8px 12px;font-size:14px}
 
-/* sample box */
-.sample{display:none;margin-top:12px;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:14px;background:rgba(0,0,0,.22)}
+/* sample / prose */
+.sample{margin-top:12px;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:16px;background:rgba(0,0,0,.22)}
 .sample.open{display:block}
+.prose p{margin:10px 0;line-height:1.7}
+
+/* shelf cards */
+.shelf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:10px}
+.book-card{display:block;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.15);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--ink)}
+.book-card img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
+.book-card .meta{padding:10px}
+.book-card .name{font-weight:600}
+.book-card .by{color:var(--muted);font-size:14px}
 
 /* 2-col grid for contact/music */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
@@ -94,3 +92,7 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 
 /* footer */
 .footer .wrap{background:transparent;border:none;box-shadow:none;text-align:center;color:var(--muted)}
+
+/* ===== reveal on scroll ===== */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.reveal.show{opacity:1;transform:none}
