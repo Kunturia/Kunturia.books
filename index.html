@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body id="top">
-  <!-- Ambient canvas (sakura + butterflies + sparks) -->
+  <!-- Ambient canvas (sakura + butterflies + sparks).
+       pointer-events is disabled in CSS so it never blocks clicks. -->
   <canvas id="sakura"></canvas>
 
   <!-- Header -->
@@ -36,7 +37,7 @@
           <p class="subtitle">A BL novel by Kunturia</p>
           <p class="blurb">
             Vows that refuse to die. Petals that fall when blades are drawn.
-            Step into a red-gold world where memory and fate pull at the same thread.
+            Step into a red-gold world where memory and fate pull the same thread.
           </p>
           <div class="cta-row">
             <a class="btn primary" href="#book">View Details</a>
@@ -84,10 +85,9 @@
             <a class="btn ghost" href="#contact">Contact Author</a>
           </div>
 
-          <!-- Read Sample (toggle open/close with the button) -->
+          <!-- Read Sample -->
           <div id="sampleBox" class="sample">
             <h3>Sample</h3>
-
             <p><em>The years had not been kind to Xin Zhi.</em></p>
             <p>In the Heavenly Court, whispers followed him wherever he went.</p>
             <p>“He’s a weak god…” “Only knows how to heal scratches…” “A candle in the wind—better snuffed out than sheltered.”</p>
@@ -113,7 +113,6 @@
       <div class="wrap">
         <h2>Bookshelf</h2>
         <p class="shelf-note">The shelf awaits future releases. For now, all incense burns for this volume.</p>
-
         <div class="shelf-grid">
           <article class="book-card">
             <div class="spine"></div>
@@ -124,7 +123,6 @@
               <a class="btn tiny" href="#book">Details</a>
             </div>
           </article>
-          <!-- Add more .book-card items later -->
         </div>
       </div>
     </section>
@@ -161,14 +159,13 @@
         </div>
         <div>
           <h3 class="ornament">Background Music</h3>
-      
-         <!-- Autoplay after first click/tap; manual toggle button shown -->
-<audio id="bgm" preload="auto" loop src="assets/bgm.mp3"></audio>
-<button id="musicToggle" class="btn ghost" style="margin-top:8px">Play music</button>
-<p class="small" style="color:var(--muted)">
-  If your browser blocks autoplay, click “Play music” once.
-</p>
+          <p>Flute, erhu, and guqin ambience to read by.</p>
 
+          <!-- Autoplay after first gesture; button toggles -->
+          <audio id="bgm" preload="auto" loop src="assets/bgm.mp3"></audio>
+          <button id="musicToggle" class="btn ghost" style="margin-top:8px">Play music</button>
+
+          <p class="small" style="color:var(--muted)">If autoplay is blocked, click anywhere or the button once.</p>
         </div>
       </div>
     </section>
@@ -187,7 +184,6 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="script.js"></script>
 </body>
 </html>
