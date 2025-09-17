@@ -70,68 +70,39 @@ function makeToggle(btnId, boxId, labels = ['Read','Hide']){
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
-// ---------- Music (playlist + robust) ----------
-const bgm = document.getElementById('bgm');
-const musicBtn = document.getElementById('musicToggle');
-const trackLabel = document.getElementById('currentTrack'); // <p id="currentTrack"> in HTML
-let currentTitle = '';
+// ---------- Playlist Music Player ----------
+const tracks = [
+  { src: "assets/bgm.mp3", title: "Xinzhi’s Theme (OST)" },
+  { src: "assets/Da Yu.mp3", title: "Da Yu – Zhou Shen" },
+  { src: "assets/Playing Da Yu.mp3", title: "Playing Da Yu – Zhou Shen" },
+  { src: "assets/Together forever.mp3", title: "Together Forever – Zhou Shen" }
+];
 
-function setLabel(t) {
-  if (!trackLabel) return;
-  trackLabel.textContent = t ? `Now playing: ${t}` : 'No track playing.';
+let current = 0;
+const bgm = document.getElementById("bgm");
+const playBtn = document.getElementById("playPauseBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const titleEl = document.getElementById("track-title");
+
+function loadTrack(i){
+  current = (i + tracks.length) % tracks.length;
+  bgm.src = tracks[current].src;
+  titleEl.textContent = tracks[current].title;
+  bgm.play().then(()=> sync()).catch(()=> sync());
 }
+function sync(){ playBtn.textContent = bgm.paused ? "▶" : "⏸"; }
 
-function playTrack(src, title) {
-  if (!bgm) return;
+playBtn.addEventListener("click", () => {
+  if (bgm.paused){ bgm.play().then(sync); } else { bgm.pause(); sync(); }
+});
+prevBtn.addEventListener("click", () => loadTrack(current-1));
+nextBtn.addEventListener("click", () => loadTrack(current+1));
+bgm.addEventListener("ended", () => loadTrack(current+1));
 
-  // If same song pressed again, restart from beginning; else load new src
-  if (!bgm.src.endsWith(src)) bgm.src = src; else bgm.currentTime = 0;
+bgm.volume = 0.25;
+loadTrack(0);
 
-  currentTitle = title || currentTitle;
-
-  bgm.play()
-    .then(() => { sync(); setLabel(currentTitle); })
-    .catch(() => {         setLabel(`${currentTitle} (click Play)`); });
-}
-
-function sync() {
-  if (!musicBtn || !bgm) return;
-  musicBtn.textContent = bgm.paused ? 'Play Music' : 'Pause Music';
-  musicBtn.setAttribute('aria-pressed', String(!bgm.paused));
-}
-
-if (bgm) {
-  bgm.volume = 0.25;
-
-  // try autoplay (won't start until a track is chosen if src is empty)
-  bgm.play().then(sync).catch(sync);
-
-  // one-time user gesture unlock for autoplay blocks
-  const unlock = () => { bgm.play().then(sync).catch(()=>{}); cleanup(); };
-  const cleanup = () => {
-    window.removeEventListener('pointerdown', unlock);
-    window.removeEventListener('keydown', unlock);
-    window.removeEventListener('touchstart', unlock);
-  };
-  window.addEventListener('pointerdown', unlock, { once:true });
-  window.addEventListener('keydown',   unlock, { once:true });
-  window.addEventListener('touchstart',unlock, { once:true });
-
-  // Play/Pause toggle button (optional, still works with playlist)
-  if (musicBtn) {
-    musicBtn.addEventListener('click', () => {
-      if (bgm.paused) bgm.play().then(sync); else { bgm.pause(); sync(); }
-    });
-  }
-}
-
-// Optional: quick stop you can hook to a button if you want
-function stopMusic(){
-  if (!bgm) return;
-  bgm.pause();
-  bgm.currentTime = 0;
-  sync();
-  setLabel('');
 }
 
 
