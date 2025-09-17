@@ -81,7 +81,7 @@
         <button id="prologueBtn" class="btn small" aria-controls="prologueBox" aria-expanded="false">Read Prologue</button>
         <div id="prologueBox" class="sample prose" hidden>
           <!-- PROLOGUE TEXT -->
-          <p><em>The End of Two Halves</em></p>
+          <p><em>The End of Two Souls</em></p>
           <p>In the year of the 1800s, when the war between the celestial gods and demonic lords reached its peak, two figures stood at the eye of the storm, locked in a battle not just for dominion, but for destiny.</p>
           <p>One man, adorned with divine radiance like a faint golden crown hovering above him, pointed a gleaming holy sword at the throat of the other.</p>
           <p>A mask covered half of his face, cracked, incomplete and yet his eyes were resolute.</p>
@@ -192,7 +192,7 @@
     <section id="contact" class="panel reveal">
       <div class="wrap grid-2">
         <div>
-          <h2 class="h" id="follow">Where to Read & Follow</h2>
+          <h2 class="h" id="follow">Where to Read &amp; Follow</h2>
           <ul class="links">
             <li><a href="https://www.wattpad.com/user/Kunturia" target="_blank" rel="noopener">Wattpad — @Kunturia</a></li>
             <li><a href="https://x.com/ArturiaKun" target="_blank" rel="noopener">Twitter — @ArturiaKun</a></li>
@@ -202,31 +202,29 @@
         </div>
 
         <div>
-          
-      <!-- ===== Sticky Music Bar ===== -->
-<div class="music-bar">
-  <div class="mb-wrap">
-    <div class="mb-left">
-      <strong id="track-title">Xinzhi’s Theme (OST)</strong>
-    </div>
+          <!-- ===== Sticky Music Bar ===== -->
+          <div class="music-bar" role="region" aria-label="Music player">
+            <div class="mb-wrap">
+              <div class="mb-left">
+                <strong id="track-title">Xinzhi’s Theme (OST)</strong>
+              </div>
 
-    <div class="mb-controls">
-      <button id="prevBtn" aria-label="Previous">⏮</button>
-      <button id="playPauseBtn" aria-label="Play / Pause">▶</button>
-      <button id="nextBtn" aria-label="Next">⏭</button>
-    </div>
+              <div class="mb-controls">
+                <button id="prevBtn" type="button" aria-label="Previous">⏮</button>
+                <button id="playPauseBtn" type="button" aria-label="Play / Pause">▶</button>
+                <button id="nextBtn" type="button" aria-label="Next">⏭</button>
+              </div>
 
-    <!-- the audio element lives in the bar -->
-    <audio id="bgm" preload="auto"></audio>
-  </div>
-</div>
-<!-- ===== /Sticky Music Bar ===== -->
+              <!-- the audio element lives in the bar -->
+              <audio id="bgm" preload="auto"></audio>
+            </div>
+          </div>
+          <!-- ===== /Sticky Music Bar ===== -->
 
-
-<button id="musicToggle" class="btn ghost" aria-pressed="false">Play Music</button>
-<p id="currentTrack" class="muted small">No track playing.</p>
-
-
+          <button id="musicToggle" class="btn ghost" type="button" aria-pressed="false">Play Music</button>
+          <p id="currentTrack" class="muted small">No track playing.</p>
+        </div> <!-- CLOSE column 2 -->
+      </div>   <!-- CLOSE wrap grid-2 -->
     </section>
 
     <footer class="footer">
@@ -236,6 +234,92 @@
     </footer>
   </main>
 
+  <!-- Your existing site script (animations, reveal, ambient, etc.) -->
   <script src="script.js"></script>
+
+  <!-- Inline: minimal, conflict-safe music wiring -->
+  <script>
+  (function () {
+    if (window.__musicWired) return; // avoid double-binding if script.js also wires things
+    window.__musicWired = true;
+
+    const audio = document.getElementById('bgm');
+    const titleEl = document.getElementById('track-title');
+    const statusEl = document.getElementById('currentTrack');
+    const playBtn = document.getElementById('playPauseBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const toggleBtn = document.getElementById('musicToggle');
+    const yearEl = document.getElementById('year');
+
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Update this to your actual audio file paths
+    const tracks = [
+      { title: "Xinzhi’s Theme (OST)", src: "assets/audio/xinzhi-theme.mp3" }
+      // { title: "Lan Zeyan’s Theme", src: "assets/audio/lan-zeyan.mp3" },
+    ];
+
+    let idx = 0;
+
+    function load(i) {
+      idx = (i + tracks.length) % tracks.length;
+      const t = tracks[idx];
+      audio.src = t.src;
+      titleEl.textContent = t.title;
+      statusEl.textContent = "Ready: " + t.title;
+    }
+
+    function updateButtons(isPlaying) {
+      playBtn.textContent = isPlaying ? "⏸" : "▶";
+      toggleBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+      toggleBtn.textContent = isPlaying ? 'Pause Music' : 'Play Music';
+    }
+
+    function play() {
+      audio.play().then(function () {
+        updateButtons(true);
+        statusEl.textContent = "Now playing: " + tracks[idx].title;
+      }).catch(function (err) {
+        statusEl.textContent = "Could not start audio. Click again to allow playback.";
+        console.error(err);
+      });
+    }
+
+    function pause() {
+      audio.pause();
+      updateButtons(false);
+      statusEl.textContent = "Paused.";
+    }
+
+    if (playBtn) playBtn.addEventListener('click', function () {
+      if (!audio.src) load(idx);
+      audio.paused ? play() : pause();
+    });
+
+    if (toggleBtn) toggleBtn.addEventListener('click', function () {
+      if (!audio.src) load(idx);
+      audio.paused ? play() : pause();
+    });
+
+    if (nextBtn) nextBtn.addEventListener('click', function () {
+      load(idx + 1);
+      play();
+    });
+
+    if (prevBtn) prevBtn.addEventListener('click', function () {
+      load(idx - 1);
+      play();
+    });
+
+    audio.addEventListener('ended', function () {
+      load(idx + 1);
+      play();
+    });
+
+    // initial load
+    load(0);
+  })();
+  </script>
 </body>
 </html>
