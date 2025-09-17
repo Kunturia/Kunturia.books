@@ -203,17 +203,25 @@
 
         <div>
           
-       <h2 class="h">Background Music</h2>
-<p>Select a track to play:</p>
+      <!-- ===== Sticky Music Bar ===== -->
+<div class="music-bar">
+  <div class="mb-wrap">
+    <div class="mb-left">
+      <strong id="track-title">Xinzhi’s Theme (OST)</strong>
+    </div>
 
-<audio id="bgm" preload="auto" loop></audio>
+    <div class="mb-controls">
+      <button id="prevBtn" aria-label="Previous">⏮</button>
+      <button id="playPauseBtn" aria-label="Play / Pause">▶</button>
+      <button id="nextBtn" aria-label="Next">⏭</button>
+    </div>
 
-<div class="music-controls">
-  <button onclick="playTrack('assets/bgm.mp3', 'Xinzhi’s Theme')">Xinzhi’s Theme</button>
-  <button onclick="playTrack('assets/Da Yu.mp3', 'Da Yu — Zhou Shen')">Da Yu</button>
-  <button onclick="playTrack('assets/Playing Da Yu.mp3', 'Playing Da Yu')">Playing Da Yu</button>
-  <button onclick="playTrack('assets/Together forever.mp3', 'Together Forever — Zhou Shen')">Together Forever</button>
+    <!-- the audio element lives in the bar -->
+    <audio id="bgm" preload="auto"></audio>
+  </div>
 </div>
+<!-- ===== /Sticky Music Bar ===== -->
+
 
 <button id="musicToggle" class="btn ghost" aria-pressed="false">Play Music</button>
 <p id="currentTrack" class="muted small">No track playing.</p>
