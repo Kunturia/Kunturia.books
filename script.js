@@ -70,20 +70,43 @@ function makeToggle(btnId, boxId, labels = ['Read','Hide']){
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
-// ---------- Music (robust) ----------
+// ---------- Music (playlist + robust) ----------
 const bgm = document.getElementById('bgm');
 const musicBtn = document.getElementById('musicToggle');
+const trackLabel = document.getElementById('currentTrack'); // <p id="currentTrack"> in HTML
+let currentTitle = '';
 
-if (bgm && musicBtn){
+function setLabel(t) {
+  if (!trackLabel) return;
+  trackLabel.textContent = t ? `Now playing: ${t}` : 'No track playing.';
+}
+
+function playTrack(src, title) {
+  if (!bgm) return;
+
+  // If same song pressed again, restart from beginning; else load new src
+  if (!bgm.src.endsWith(src)) bgm.src = src; else bgm.currentTime = 0;
+
+  currentTitle = title || currentTitle;
+
+  bgm.play()
+    .then(() => { sync(); setLabel(currentTitle); })
+    .catch(() => {         setLabel(`${currentTitle} (click Play)`); });
+}
+
+function sync() {
+  if (!musicBtn || !bgm) return;
+  musicBtn.textContent = bgm.paused ? 'Play Music' : 'Pause Music';
+  musicBtn.setAttribute('aria-pressed', String(!bgm.paused));
+}
+
+if (bgm) {
   bgm.volume = 0.25;
 
-  function sync(){
-    musicBtn.textContent = bgm.paused ? 'Play Xinzhi’s Theme (OST)' : 'Pause Xinzhi’s Theme';
-    musicBtn.setAttribute('aria-pressed', String(!bgm.paused));
-  }
+  // try autoplay (won't start until a track is chosen if src is empty)
+  bgm.play().then(sync).catch(sync);
 
-  bgm.play().then(sync).catch(sync); // attempt autoplay
-
+  // one-time user gesture unlock for autoplay blocks
   const unlock = () => { bgm.play().then(sync).catch(()=>{}); cleanup(); };
   const cleanup = () => {
     window.removeEventListener('pointerdown', unlock);
@@ -94,10 +117,23 @@ if (bgm && musicBtn){
   window.addEventListener('keydown',   unlock, { once:true });
   window.addEventListener('touchstart',unlock, { once:true });
 
-  musicBtn.addEventListener('click', () => {
-    if (bgm.paused) bgm.play().then(sync); else { bgm.pause(); sync(); }
-  });
+  // Play/Pause toggle button (optional, still works with playlist)
+  if (musicBtn) {
+    musicBtn.addEventListener('click', () => {
+      if (bgm.paused) bgm.play().then(sync); else { bgm.pause(); sync(); }
+    });
+  }
 }
+
+// Optional: quick stop you can hook to a button if you want
+function stopMusic(){
+  if (!bgm) return;
+  bgm.pause();
+  bgm.currentTime = 0;
+  sync();
+  setLabel('');
+}
+
 
 // ---------- Reveal on scroll ----------
 const reveals = document.querySelectorAll('.reveal');
