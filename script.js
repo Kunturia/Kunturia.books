@@ -1,6 +1,6 @@
 /* ===== Gold fireflies + playlist music + toggles + scroll reveal ===== */
 
-// ---------- Ambient fireflies ----------
+/* ---------- Ambient fireflies ---------- */
 const canvas = document.getElementById('ambient');
 const ctx = canvas.getContext('2d');
 
@@ -16,8 +16,8 @@ function mkFly(){
     vx:(Math.random()-0.5)*0.12,
     vy:(Math.random()-0.5)*0.12,
     r: Math.random()*1.5 + 0.8,
-    a: Math.random()*0.35 + 0.35,    // base alpha
-    tw: Math.random()*0.002 + 0.001, // twinkle speed
+    a: Math.random()*0.35 + 0.35,
+    tw: Math.random()*0.002 + 0.001,
     ph: Math.random()*Math.PI*2
   };
 }
@@ -42,73 +42,117 @@ function loop(t=0){
 }
 requestAnimationFrame(loop);
 
-// ---------- Year ----------
+/* ---------- Year ---------- */
 const y = document.getElementById('year');
 if (y) y.textContent = new Date().getFullYear();
 
-// ---------- Prologue & Sample toggles ----------
+/* ---------- Prologue & Sample toggles ---------- */
 function makeToggle(btnId, boxId, labels = ['Read','Hide']){
   const btn = document.getElementById(btnId);
   const box = document.getElementById(boxId);
   if (!btn || !box) return;
 
+  const base = btn.textContent.replace(/^Read |Hide /,''); // preserve the tail label
   const set = (open) => {
     btn.setAttribute('aria-expanded', String(open));
-    btn.textContent = open ? `${labels[1]} ${btn.textContent.replace(/^Read |Hide /,'')}`
-                           : `${labels[0]} ${btn.textContent.replace(/^Read |Hide /,'')}`;
+    btn.textContent = (open ? labels[1] : labels[0]) + ' ' + base;
   };
 
-  // start closed
   box.hidden = true; set(false);
-
-  btn.addEventListener('click', () => {
-    box.hidden = !box.hidden;
-    set(!box.hidden);
-  });
+  btn.addEventListener('click', () => { box.hidden = !box.hidden; set(!box.hidden); });
 }
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
-// ---------- Playlist Music Player ----------
+/* ---------- Playlist Music Player ---------- */
+// Tip: avoid spaces in actual filenames if you can. If not, we encode below.
 const tracks = [
-  { src: "assets/bgm.mp3", title: "Xinzhi’s Theme (OST)" },
-  { src: "assets/Da Yu.mp3", title: "Da Yu – Zhou Shen" },
-  { src: "assets/Playing Da Yu.mp3", title: "Playing Da Yu – Zhou Shen" },
-  { src: "assets/Together forever.mp3", title: "Together Forever – Zhou Shen" }
+  { src: "assets/bgm.mp3",                title: "Xinzhi’s Theme (OST)" },
+  { src: "assets/Da Yu.mp3",              title: "Da Yu – Zhou Shen" },
+  { src: "assets/Playing Da Yu.mp3",      title: "Playing Da Yu – Zhou Shen" },
+  { src: "assets/Together forever.mp3",   title: "Together Forever – Zhou Shen" }
 ];
 
 let current = 0;
-const bgm = document.getElementById("bgm");
-const playBtn = document.getElementById("playPauseBtn");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-const titleEl = document.getElementById("track-title");
 
-// Only wire up if the elements exist (prevents null errors)
+const bgm       = document.getElementById("bgm");
+const playBtn   = document.getElementById("playPauseBtn");
+const prevBtn   = document.getElementById("prevBtn");
+const nextBtn   = document.getElementById("nextBtn");
+const titleEl   = document.getElementById("track-title");
+const toggleBtn = document.getElementById("musicToggle");
+const statusEl  = document.getElementById("currentTrack");
+
 if (bgm && playBtn && prevBtn && nextBtn && titleEl) {
   function loadTrack(i){
     current = (i + tracks.length) % tracks.length;
-    bgm.src = tracks[current].src;
-    titleEl.textContent = tracks[current].title;
-    bgm.play().then(sync).catch(sync);  // autoplay might be blocked; sync UI anyway
+    const tr = tracks[current];
+
+    // Encode src so "Da Yu.mp3" works on stricter servers
+    bgm.src = encodeURI(tr.src);
+    titleEl.textContent = tr.title;
+
+    // Only prep by default; don't auto-play (mobile autoplay rules).
+    syncUI();
+    if (statusEl) statusEl.textContent = `Ready: ${tr.title}`;
   }
-  function sync(){ playBtn.textContent = bgm.paused ? "▶" : "⏸"; }
+
+  function syncUI(){
+    const playing = !bgm.paused && !bgm.ended && bgm.currentTime > 0;
+    playBtn.textContent = playing ? "⏸" : "▶";
+    if (toggleBtn){
+      toggleBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+      toggleBtn.textContent = playing ? 'Pause Music' : 'Play Music';
+    }
+  }
+
+  async function tryPlay(){
+    try {
+      await bgm.play();
+      if (statusEl) statusEl.textContent = `Now playing: ${tracks[current].title}`;
+    } catch (e) {
+      // Browsers may block; user can click again
+      if (statusEl) statusEl.textContent = "Click to start playback.";
+      console.warn(e);
+    } finally {
+      syncUI();
+    }
+  }
+
+  function pause(){
+    bgm.pause();
+    if (statusEl) statusEl.textContent = "Paused.";
+    syncUI();
+  }
 
   playBtn.addEventListener("click", () => {
-    if (bgm.paused){ bgm.play().then(sync); } else { bgm.pause(); sync(); }
+    if (!bgm.src) loadTrack(current);
+    bgm.paused ? tryPlay() : pause();
   });
-  prevBtn.addEventListener("click", () => loadTrack(current-1));
-  nextBtn.addEventListener("click", () => loadTrack(current+1));
-  bgm.addEventListener("ended", () => loadTrack(current+1));
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      if (!bgm.src) loadTrack(current);
+      bgm.paused ? tryPlay() : pause();
+    });
+  }
+
+  prevBtn.addEventListener("click", () => { loadTrack(current-1); tryPlay(); });
+  nextBtn.addEventListener("click", () => { loadTrack(current+1); tryPlay(); });
+
+  bgm.addEventListener("ended", () => { loadTrack(current+1); tryPlay(); });
+  bgm.addEventListener("error", () => {
+    if (statusEl) statusEl.textContent = "Audio error. Check file path/format.";
+    syncUI();
+  });
 
   bgm.volume = 0.25;
-  loadTrack(0);
+  loadTrack(0);  // prepare first track; waits for a click to play
 } else {
-  // Helpful hint in console if IDs don’t match your HTML
   console.warn("Music player elements not found. Check IDs: bgm, playPauseBtn, prevBtn, nextBtn, track-title");
 }
 
-// ---------- Reveal on scroll ----------
+/* ---------- Reveal on scroll ---------- */
 const reveals = document.querySelectorAll('.reveal');
 const io = new IntersectionObserver((entries)=>{
   for (const e of entries){
