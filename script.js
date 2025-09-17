@@ -1,4 +1,4 @@
-/* ===== Fireflies + toggles + auto-path music player + reveal ===== */
+/* ===== Fireflies + toggles + playlist music + reveal ===== */
 
 /* ---------- Ambient fireflies ---------- */
 const canvas = document.getElementById('ambient');
@@ -64,104 +64,79 @@ function makeToggle(btnId, boxId, labels=['Read','Hide']){
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
-/* ---------- Auto-path Playlist Music Player ---------- */
-/* Exact filenames from your repo root */
-const FILES = [
-  { name: "bgm.mp3",               title: "Xinzhi’s Theme (OST)" },
-  { name: "Da Yu.mp3",             title: "Da Yu – Zhou Shen" },
-  { name: "Playing Da Yu.mp3",     title: "Playing Da Yu – Zhou Shen" },
-  { name: "Together forever.mp3",  title: "Together Forever – Zhou Shen" }
+/* ---------- Playlist Music Player ---------- */
+/* Uses your exact files in /assets */
+const PLAYLIST = [
+  { src: "assets/bgm.mp3",               title: "Xinzhi’s Theme (OST)" },
+  { src: "assets/Da Yu.mp3",             title: "Da Yu – Zhou Shen" },
+  { src: "assets/Playing Da Yu.mp3",     title: "Playing Da Yu – Zhou Shen" },
+  { src: "assets/Together forever.mp3",  title: "Together Forever – Zhou Shen" }
 ];
 
-const bgm       = document.getElementById('bgm');      // <audio id="bgm" preload="auto" playsinline></audio>
-const titleEl   = document.getElementById('track-title');
-const statusEl  = document.getElementById('currentTrack');
-const playBtn   = document.getElementById('playPauseBtn');
-const prevBtn   = document.getElementById('prevBtn');
-const nextBtn   = document.getElementById('nextBtn');
-const toggleBtn = document.getElementById('musicToggle');
+let current = 0;
+const bgm       = document.getElementById("bgm");
+const playBtn   = document.getElementById("playPauseBtn");
+const prevBtn   = document.getElementById("prevBtn");
+const nextBtn   = document.getElementById("nextBtn");
+const titleEl   = document.getElementById("track-title");
+const toggleBtn = document.getElementById("musicToggle");
+const statusEl  = document.getElementById("currentTrack");
 
-let basePath = "./";     // will be auto-resolved
-let idx = 0;
-
-function setStatus(t){ if (statusEl) statusEl.textContent = t; }
-function syncButtons(isPlaying){
-  playBtn.textContent = isPlaying ? "⏸" : "▶";
+function setStatus(t){ if(statusEl) statusEl.textContent = t; }
+function syncUI(){
+  const playing = !bgm.paused && !bgm.ended && bgm.currentTime > 0;
+  playBtn.textContent = playing ? "⏸" : "▶";
   if (toggleBtn){
-    toggleBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
-    toggleBtn.textContent = isPlaying ? "Pause Music" : "Play Music";
+    toggleBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    toggleBtn.textContent = playing ? "Pause Music" : "Play Music";
   }
 }
 
-/* Find a working base path depending on where index.html lives:
-   tries "./", "../", "../../" against bgm.mp3 */
-async function resolveBase(){
-  const bases = ["./","../","../../"];
-  for (const b of bases){
-    try{
-      const url = encodeURI(b + FILES[0].name);
-      const res = await fetch(url, { method: "HEAD", cache: "no-store" });
-      if (res.ok) return b;
-    }catch(_){}
-  }
-  return "./"; // fallback
-}
-
-function srcFor(i){
-  return encodeURI(basePath + FILES[i].name);
-}
-
-async function load(i){
-  idx = (i + FILES.length) % FILES.length;
-  const tr = FILES[idx];
+function loadTrack(i){
+  current = (i + PLAYLIST.length) % PLAYLIST.length;
+  const tr = PLAYLIST[current];
+  bgm.src = encodeURI(tr.src);        // handles spaces in names
   titleEl.textContent = tr.title;
-  const url = srcFor(idx);
-  bgm.src = url;
-  setStatus("Ready: " + tr.title + " (" + url + ")");
-  syncButtons(false);
+  setStatus("Ready: " + tr.title);
+  syncUI();
 }
 
 async function tryPlay(){
   try{
     await bgm.play();
-    setStatus("Now playing: " + FILES[idx].title);
-    syncButtons(true);
+    setStatus("Now playing: " + PLAYLIST[current].title);
   }catch(err){
-    const code = bgm.error && bgm.error.code; // 1..4
-    setStatus(`Could not start audio (${err?.name || "Error"}${code ? " code "+code : ""}). URL: ${bgm.src}`);
-    syncButtons(false);
-    console.warn("play() failed", {err, code, url: bgm.src});
+    const code = bgm.error && bgm.error.code;
+    setStatus(`Could not start audio (${err?.name || "Error"}${code ? " code "+code : ""}).`);
+  }finally{
+    syncUI();
   }
 }
 
 function pause(){
   bgm.pause();
   setStatus("Paused.");
-  syncButtons(false);
+  syncUI();
 }
 
-/* Wire */
+/* Wire up controls */
 if (bgm && playBtn && prevBtn && nextBtn && titleEl){
-  (async () => {
-    basePath = await resolveBase();
-    await load(0);
-  })();
+  playBtn.addEventListener("click", ()=>{ bgm.paused ? tryPlay() : pause(); });
+  if (toggleBtn) toggleBtn.addEventListener("click", ()=>{ bgm.paused ? tryPlay() : pause(); });
+  prevBtn.addEventListener("click", ()=>{ loadTrack(current-1); tryPlay(); });
+  nextBtn.addEventListener("click", ()=>{ loadTrack(current+1); tryPlay(); });
 
-  playBtn.addEventListener('click', ()=>{ bgm.paused ? tryPlay() : pause(); });
-  if (toggleBtn) toggleBtn.addEventListener('click', ()=>{ bgm.paused ? tryPlay() : pause(); });
-  prevBtn.addEventListener('click', ()=>{ load(idx-1).then(tryPlay); });
-  nextBtn.addEventListener('click', ()=>{ load(idx+1).then(tryPlay); });
-
-  bgm.addEventListener('ended', ()=>{ load(idx+1).then(tryPlay); });
-  bgm.addEventListener('error', ()=>{
+  bgm.addEventListener("ended", ()=>{ loadTrack(current+1); tryPlay(); });
+  bgm.addEventListener("error", ()=>{
     const code = bgm.error && bgm.error.code;
-    setStatus(`Audio error (code ${code || "?"}). URL: ${bgm.src}`);
-    syncButtons(false);
+    setStatus(`Audio error (code ${code || "?"}). Check file path/format.`);
+    syncUI();
   });
 
   bgm.volume = 0.25;
+  loadTrack(0); // prepare first track; first click starts it
 }else{
-  console.warn("Music player elements not found. Check IDs.");
+  console.warn("Music player elements not found.");
 }
 
 /* ---------- Reveal on scroll ---------- */
