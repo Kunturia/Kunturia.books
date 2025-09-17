@@ -1,4 +1,4 @@
-/* ===== Fireflies + toggles + resilient music player + reveal ===== */
+/* ===== Fireflies + toggles + solid music player + reveal ===== */
 
 /* ---------- Ambient fireflies ---------- */
 const canvas = document.getElementById('ambient');
@@ -64,13 +64,13 @@ function makeToggle(btnId, boxId, labels=['Read','Hide']){
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
-/* ---------- Resilient Playlist Music Player ---------- */
-/* Using your current filenames (repo root): */
+/* ---------- Playlist Music Player ---------- */
+/* Use the cleaned names/paths below */
 const PLAYLIST = [
-  { src: "bgm.mp3",              title: "Xinzhi’s Theme (OST)" },
-  { src: "Da Yu.mp3",            title: "Da Yu – Zhou Shen" },
-  { src: "Playing Da Yu.mp3",    title: "Playing Da Yu – Zhou Shen" },
-  { src: "Together forever.mp3", title: "Together Forever – Zhou Shen" }
+  { src: "assets/audio/bgm-xinzhi.mp3",              title: "Xinzhi’s Theme (OST)" },
+  { src: "assets/audio/da-yu-zhoushen.mp3",          title: "Da Yu – Zhou Shen" },
+  { src: "assets/audio/playing-da-yu-zhoushen.mp3",  title: "Playing Da Yu – Zhou Shen" },
+  { src: "assets/audio/together-forever-zhoushen.mp3", title: "Together Forever – Zhou Shen" }
 ];
 
 const bgm       = document.getElementById('bgm');
@@ -82,35 +82,9 @@ const nextBtn   = document.getElementById('nextBtn');
 const toggleBtn = document.getElementById('musicToggle');
 
 let idx = 0;
-let resolvedSrc = null;
+let currentURL = "";
 
-/* Try ./, ../, ../../ for GitHub Pages “/docs/” setups, etc. */
-async function resolvePath(raw){
-  const encoded = encodeURI(raw);
-  const bases = ["", "../", "../../"];
-  for (const b of bases){
-    const url = b + encoded;
-    try{
-      const r = await fetch(url, { method: "HEAD", cache: "no-store" });
-      if (r.ok) return url;
-    }catch(_){} // ignore
-  }
-  return encoded; // fallback (may still fail, but we’ll report it)
-}
-
-async function load(i){
-  idx = (i + PLAYLIST.length) % PLAYLIST.length;
-  const tr = PLAYLIST[idx];
-  titleEl.textContent = tr.title;
-  if (statusEl) statusEl.textContent = "Loading… " + tr.title;
-
-  resolvedSrc = await resolvePath(tr.src);
-  bgm.src = resolvedSrc;
-  bgm.load();
-  if (statusEl) statusEl.textContent = "Ready: " + tr.title + " (" + resolvedSrc + ")";
-  syncButtons(false);
-}
-
+function setStatus(text){ if (statusEl) statusEl.textContent = text; }
 function syncButtons(isPlaying){
   playBtn.textContent = isPlaying ? "⏸" : "▶";
   if (toggleBtn){
@@ -119,48 +93,54 @@ function syncButtons(isPlaying){
   }
 }
 
+function load(i){
+  idx = (i + PLAYLIST.length) % PLAYLIST.length;
+  const tr = PLAYLIST[idx];
+  currentURL = tr.src;               // direct path; no guessing
+  bgm.src = tr.src;                  // server will resolve relative to index.html
+  titleEl.textContent = tr.title;
+  setStatus("Ready: " + tr.title + " (" + currentURL + ")");
+  syncButtons(false);
+}
+
 async function tryPlay(){
   try{
     await bgm.play();
-    if (statusEl) statusEl.textContent = "Now playing: " + PLAYLIST[idx].title;
+    setStatus("Now playing: " + PLAYLIST[idx].title);
     syncButtons(true);
   }catch(err){
-    const msg = (err && (err.name || err.message)) ? `${err.name || ""} ${err.message || ""}`.trim() : "Unknown";
-    if (statusEl) statusEl.textContent = `Could not start audio (${msg}). Click again. URL: ${resolvedSrc || "(none)"}`;
+    const code = bgm.error && bgm.error.code;
+    const name = (err && err.name) || "Error";
+    setStatus(`Could not start audio (${name}${code ? " code "+code : ""}). URL: ${currentURL}`);
     syncButtons(false);
-    console.warn("Audio play() failed:", err, "URL:", resolvedSrc);
+    console.warn("play() failed", {err, code, url: currentURL});
   }
 }
 
 function pause(){
   bgm.pause();
+  setStatus("Paused.");
   syncButtons(false);
-  if (statusEl) statusEl.textContent = "Paused.";
 }
 
-/* Wire events */
+/* Wire */
 if (bgm && playBtn && prevBtn && nextBtn && titleEl){
-  playBtn.addEventListener('click', ()=>{ if (bgm.paused) tryPlay(); else pause(); });
-  if (toggleBtn) toggleBtn.addEventListener('click', ()=>{ if (bgm.paused) tryPlay(); else pause(); });
-  prevBtn.addEventListener('click', ()=>{ load(idx-1).then(tryPlay); });
-  nextBtn.addEventListener('click', ()=>{ load(idx+1).then(tryPlay); });
+  playBtn.addEventListener('click', ()=>{ bgm.paused ? tryPlay() : pause(); });
+  if (toggleBtn) toggleBtn.addEventListener('click', ()=>{ bgm.paused ? tryPlay() : pause(); });
+  prevBtn.addEventListener('click', ()=>{ load(idx-1); tryPlay(); });
+  nextBtn.addEventListener('click', ()=>{ load(idx+1); tryPlay(); });
 
-  bgm.addEventListener('ended', ()=>{ load(idx+1).then(tryPlay); });
+  bgm.addEventListener('ended', ()=>{ load(idx+1); tryPlay(); });
   bgm.addEventListener('error', ()=>{
-    const code = bgm.error && bgm.error.code;
-    if (statusEl) statusEl.textContent = `Audio error (code ${code || "?"}). URL: ${resolvedSrc || "(none)"}`;
+    const code = bgm.error && bgm.error.code; // 1..4 (4 = SRC_NOT_SUPPORTED)
+    setStatus(`Audio error (code ${code || "?"}). URL: ${currentURL}`);
     syncButtons(false);
   });
 
   bgm.volume = 0.25;
-  // Defer initial load until first click to satisfy strict mobile browsers
-  const armAndLoad = async ()=>{
-    document.removeEventListener('click', armAndLoad, true);
-    await load(0);
-  };
-  document.addEventListener('click', armAndLoad, true);
+  load(0); // ready the first track; user click will start it
 }else{
-  console.warn("Music player elements not found. Check IDs.");
+  console.warn("Music player elements not found.");
 }
 
 /* ---------- Reveal on scroll ---------- */
