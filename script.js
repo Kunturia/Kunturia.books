@@ -72,6 +72,9 @@ const PLAYLIST = [
   { src: "assets/Playing Da Yu.mp3",     title: "Playing Da Yu – Zhou Shen" },
   { src: "assets/Together forever.mp3",  title: "Together Forever" },
   { src: "assets/Lotus Dream.mp3",       title: "Lotus Dream" },
+  { src: "assets/Changlu Mountain Lament.mp3", title: "Changlu Mountain Lament" },
+  { src: "assets/Vague Sunny Day.mp3",         title: "Vague Sunny Day" },
+  { src: "assets/Light Beneath the Ashes.mp3", title: "Light Beneath the Ashes" },
 ];
 
 let current = 0;
