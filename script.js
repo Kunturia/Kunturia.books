@@ -70,7 +70,8 @@ const PLAYLIST = [
   { src: "assets/bgm.mp3",               title: "Xinzhi’s Theme (OST)" },
   { src: "assets/Da Yu.mp3",             title: "Da Yu – Zhou Shen" },
   { src: "assets/Playing Da Yu.mp3",     title: "Playing Da Yu – Zhou Shen" },
-  { src: "assets/Together forever.mp3",  title: "Together Forever – Zhou Shen" }
+  { src: "assets/Together forever.mp3",  title: "Together Forever" }
+  { src: "assets/Lotus Dream.mp3",       title: "Lotus Dream" }
 ];
 
 let current = 0;
