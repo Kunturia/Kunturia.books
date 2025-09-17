@@ -1,4 +1,4 @@
-/* ===== Fireflies + toggles + solid music player + reveal ===== */
+/* ===== Fireflies + toggles + auto-path music player + reveal ===== */
 
 /* ---------- Ambient fireflies ---------- */
 const canvas = document.getElementById('ambient');
@@ -64,16 +64,16 @@ function makeToggle(btnId, boxId, labels=['Read','Hide']){
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
-/* ---------- Playlist Music Player ---------- */
-/* Use the cleaned names/paths below */
-const PLAYLIST = [
-  { src: "assets/audio/bgm-xinzhi.mp3",              title: "Xinzhi’s Theme (OST)" },
-  { src: "assets/audio/da-yu-zhoushen.mp3",          title: "Da Yu – Zhou Shen" },
-  { src: "assets/audio/playing-da-yu-zhoushen.mp3",  title: "Playing Da Yu – Zhou Shen" },
-  { src: "assets/audio/together-forever-zhoushen.mp3", title: "Together Forever – Zhou Shen" }
+/* ---------- Auto-path Playlist Music Player ---------- */
+/* Exact filenames from your repo root */
+const FILES = [
+  { name: "bgm.mp3",               title: "Xinzhi’s Theme (OST)" },
+  { name: "Da Yu.mp3",             title: "Da Yu – Zhou Shen" },
+  { name: "Playing Da Yu.mp3",     title: "Playing Da Yu – Zhou Shen" },
+  { name: "Together forever.mp3",  title: "Together Forever – Zhou Shen" }
 ];
 
-const bgm       = document.getElementById('bgm');
+const bgm       = document.getElementById('bgm');      // <audio id="bgm" preload="auto" playsinline></audio>
 const titleEl   = document.getElementById('track-title');
 const statusEl  = document.getElementById('currentTrack');
 const playBtn   = document.getElementById('playPauseBtn');
@@ -81,10 +81,10 @@ const prevBtn   = document.getElementById('prevBtn');
 const nextBtn   = document.getElementById('nextBtn');
 const toggleBtn = document.getElementById('musicToggle');
 
+let basePath = "./";     // will be auto-resolved
 let idx = 0;
-let currentURL = "";
 
-function setStatus(text){ if (statusEl) statusEl.textContent = text; }
+function setStatus(t){ if (statusEl) statusEl.textContent = t; }
 function syncButtons(isPlaying){
   playBtn.textContent = isPlaying ? "⏸" : "▶";
   if (toggleBtn){
@@ -93,27 +93,44 @@ function syncButtons(isPlaying){
   }
 }
 
-function load(i){
-  idx = (i + PLAYLIST.length) % PLAYLIST.length;
-  const tr = PLAYLIST[idx];
-  currentURL = tr.src;               // direct path; no guessing
-  bgm.src = tr.src;                  // server will resolve relative to index.html
+/* Find a working base path depending on where index.html lives:
+   tries "./", "../", "../../" against bgm.mp3 */
+async function resolveBase(){
+  const bases = ["./","../","../../"];
+  for (const b of bases){
+    try{
+      const url = encodeURI(b + FILES[0].name);
+      const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+      if (res.ok) return b;
+    }catch(_){}
+  }
+  return "./"; // fallback
+}
+
+function srcFor(i){
+  return encodeURI(basePath + FILES[i].name);
+}
+
+async function load(i){
+  idx = (i + FILES.length) % FILES.length;
+  const tr = FILES[idx];
   titleEl.textContent = tr.title;
-  setStatus("Ready: " + tr.title + " (" + currentURL + ")");
+  const url = srcFor(idx);
+  bgm.src = url;
+  setStatus("Ready: " + tr.title + " (" + url + ")");
   syncButtons(false);
 }
 
 async function tryPlay(){
   try{
     await bgm.play();
-    setStatus("Now playing: " + PLAYLIST[idx].title);
+    setStatus("Now playing: " + FILES[idx].title);
     syncButtons(true);
   }catch(err){
-    const code = bgm.error && bgm.error.code;
-    const name = (err && err.name) || "Error";
-    setStatus(`Could not start audio (${name}${code ? " code "+code : ""}). URL: ${currentURL}`);
+    const code = bgm.error && bgm.error.code; // 1..4
+    setStatus(`Could not start audio (${err?.name || "Error"}${code ? " code "+code : ""}). URL: ${bgm.src}`);
     syncButtons(false);
-    console.warn("play() failed", {err, code, url: currentURL});
+    console.warn("play() failed", {err, code, url: bgm.src});
   }
 }
 
@@ -125,22 +142,26 @@ function pause(){
 
 /* Wire */
 if (bgm && playBtn && prevBtn && nextBtn && titleEl){
+  (async () => {
+    basePath = await resolveBase();
+    await load(0);
+  })();
+
   playBtn.addEventListener('click', ()=>{ bgm.paused ? tryPlay() : pause(); });
   if (toggleBtn) toggleBtn.addEventListener('click', ()=>{ bgm.paused ? tryPlay() : pause(); });
-  prevBtn.addEventListener('click', ()=>{ load(idx-1); tryPlay(); });
-  nextBtn.addEventListener('click', ()=>{ load(idx+1); tryPlay(); });
+  prevBtn.addEventListener('click', ()=>{ load(idx-1).then(tryPlay); });
+  nextBtn.addEventListener('click', ()=>{ load(idx+1).then(tryPlay); });
 
-  bgm.addEventListener('ended', ()=>{ load(idx+1); tryPlay(); });
+  bgm.addEventListener('ended', ()=>{ load(idx+1).then(tryPlay); });
   bgm.addEventListener('error', ()=>{
-    const code = bgm.error && bgm.error.code; // 1..4 (4 = SRC_NOT_SUPPORTED)
-    setStatus(`Audio error (code ${code || "?"}). URL: ${currentURL}`);
+    const code = bgm.error && bgm.error.code;
+    setStatus(`Audio error (code ${code || "?"}). URL: ${bgm.src}`);
     syncButtons(false);
   });
 
   bgm.volume = 0.25;
-  load(0); // ready the first track; user click will start it
 }else{
-  console.warn("Music player elements not found.");
+  console.warn("Music player elements not found. Check IDs.");
 }
 
 /* ---------- Reveal on scroll ---------- */
