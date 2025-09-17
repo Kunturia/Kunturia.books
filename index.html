@@ -202,13 +202,20 @@
         </div>
 
         <div>
-          <h2 class="h">Background Music</h2>
-          <p>Xinzhi’s Melody of Snow and Lotus</p>
-          <audio id="bgm" preload="auto" loop src="assets/bgm.mp3"></audio>
-          <button id="musicToggle" class="btn ghost" aria-pressed="false">Play Xinzhi’s Theme (OST)</button>
-          <p class="muted small">If autoplay is blocked, click anywhere on the page or press the button once.</p>
-        </div>
-      </div>
+        <h2 class="h">Background Music</h2>
+<p>Select a track to play:</p>
+
+<audio id="bgm" preload="auto" loop></audio>
+
+<div class="music-controls">
+  <button onclick="playTrack('assets/bgm.mp3', 'Xinzhi’s Theme')">Xinzhi’s Theme</button>
+  <button onclick="playTrack('assets/Da Yu.mp3', 'Da Yu — Zhou Shen')">Da Yu</button>
+  <button onclick="playTrack('assets/Playing Da Yu.mp3', 'Playing Da Yu')">Playing Da Yu</button>
+  <button onclick="playTrack('assets/Together forever.mp3', 'Together Forever — Zhou Shen')">Together Forever</button>
+</div>
+
+<p id="currentTrack" class="muted small">No track playing.</p>
+
     </section>
 
     <footer class="footer">
