@@ -1,4 +1,4 @@
-/* ===== Gold fireflies + playlist music + toggles + scroll reveal ===== */
+/* ===== Fireflies + toggles + resilient music player + reveal ===== */
 
 /* ---------- Ambient fireflies ---------- */
 const canvas = document.getElementById('ambient');
@@ -21,7 +21,7 @@ function mkFly(){
     ph: Math.random()*Math.PI*2
   };
 }
-function drawFly(f,t){
+function drawFly(f, t){
   f.x+=f.vx; f.y+=f.vy;
   if (f.x<-10) f.x=canvas.width+10; else if (f.x>canvas.width+10) f.x=-10;
   if (f.y<-10) f.y=canvas.height+10; else if (f.y>canvas.height+10) f.y=-10;
@@ -64,88 +64,103 @@ function makeToggle(btnId, boxId, labels=['Read','Hide']){
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
-/* ---------- Playlist Music Player ---------- */
-/* Using your current filenames in the REPO ROOT */
-const tracks = [
-  { src: "bgm.mp3",               title: "Xinzhi’s Theme (OST)" },
-  { src: "Da Yu.mp3",             title: "Da Yu – Zhou Shen" },
-  { src: "Playing Da Yu.mp3",     title: "Playing Da Yu – Zhou Shen" },
-  { src: "Together forever.mp3",  title: "Together Forever – Zhou Shen" }
+/* ---------- Resilient Playlist Music Player ---------- */
+/* Using your current filenames (repo root): */
+const PLAYLIST = [
+  { src: "bgm.mp3",              title: "Xinzhi’s Theme (OST)" },
+  { src: "Da Yu.mp3",            title: "Da Yu – Zhou Shen" },
+  { src: "Playing Da Yu.mp3",    title: "Playing Da Yu – Zhou Shen" },
+  { src: "Together forever.mp3", title: "Together Forever – Zhou Shen" }
 ];
 
-let current = 0;
+const bgm       = document.getElementById('bgm');
+const titleEl   = document.getElementById('track-title');
+const statusEl  = document.getElementById('currentTrack');
+const playBtn   = document.getElementById('playPauseBtn');
+const prevBtn   = document.getElementById('prevBtn');
+const nextBtn   = document.getElementById('nextBtn');
+const toggleBtn = document.getElementById('musicToggle');
 
-const bgm       = document.getElementById("bgm");
-const playBtn   = document.getElementById("playPauseBtn");
-const prevBtn   = document.getElementById("prevBtn");
-const nextBtn   = document.getElementById("nextBtn");
-const titleEl   = document.getElementById("track-title");
-const toggleBtn = document.getElementById("musicToggle");
-const statusEl  = document.getElementById("currentTrack");
+let idx = 0;
+let resolvedSrc = null;
 
-if (bgm && playBtn && prevBtn && nextBtn && titleEl) {
-  function loadTrack(i){
-    current = (i + tracks.length) % tracks.length;
-    const tr = tracks[current];
-    // Encode so spaces/UTF-8 names don’t break on static hosts
-    bgm.src = encodeURI(tr.src);
-    titleEl.textContent = tr.title;
-    syncUI();
-    if (statusEl) statusEl.textContent = `Ready: ${tr.title}`;
-  }
-
-  function syncUI(){
-    const playing = !bgm.paused && !bgm.ended && bgm.currentTime > 0;
-    playBtn.textContent = playing ? "⏸" : "▶";
-    if (toggleBtn){
-      toggleBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
-      toggleBtn.textContent = playing ? "Pause Music" : "Play Music";
-    }
-  }
-
-  async function tryPlay(){
+/* Try ./, ../, ../../ for GitHub Pages “/docs/” setups, etc. */
+async function resolvePath(raw){
+  const encoded = encodeURI(raw);
+  const bases = ["", "../", "../../"];
+  for (const b of bases){
+    const url = b + encoded;
     try{
-      await bgm.play();
-      if (statusEl) statusEl.textContent = `Now playing: ${tracks[current].title}`;
-    }catch(err){
-      if (statusEl) statusEl.textContent = "Could not start audio. Click again to allow playback.";
-      console.warn(err);
-    }finally{
-      syncUI();
-    }
+      const r = await fetch(url, { method: "HEAD", cache: "no-store" });
+      if (r.ok) return url;
+    }catch(_){} // ignore
   }
+  return encoded; // fallback (may still fail, but we’ll report it)
+}
 
-  function pause(){
-    bgm.pause();
-    if (statusEl) statusEl.textContent = "Paused.";
-    syncUI();
-  }
+async function load(i){
+  idx = (i + PLAYLIST.length) % PLAYLIST.length;
+  const tr = PLAYLIST[idx];
+  titleEl.textContent = tr.title;
+  if (statusEl) statusEl.textContent = "Loading… " + tr.title;
 
-  playBtn.addEventListener("click", ()=>{
-    if (!bgm.src) loadTrack(current);
-    bgm.paused ? tryPlay() : pause();
-  });
+  resolvedSrc = await resolvePath(tr.src);
+  bgm.src = resolvedSrc;
+  bgm.load();
+  if (statusEl) statusEl.textContent = "Ready: " + tr.title + " (" + resolvedSrc + ")";
+  syncButtons(false);
+}
 
+function syncButtons(isPlaying){
+  playBtn.textContent = isPlaying ? "⏸" : "▶";
   if (toggleBtn){
-    toggleBtn.addEventListener("click", ()=>{
-      if (!bgm.src) loadTrack(current);
-      bgm.paused ? tryPlay() : pause();
-    });
+    toggleBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+    toggleBtn.textContent = isPlaying ? "Pause Music" : "Play Music";
   }
+}
 
-  prevBtn.addEventListener("click", ()=>{ loadTrack(current-1); tryPlay(); });
-  nextBtn.addEventListener("click", ()=>{ loadTrack(current+1); tryPlay(); });
+async function tryPlay(){
+  try{
+    await bgm.play();
+    if (statusEl) statusEl.textContent = "Now playing: " + PLAYLIST[idx].title;
+    syncButtons(true);
+  }catch(err){
+    const msg = (err && (err.name || err.message)) ? `${err.name || ""} ${err.message || ""}`.trim() : "Unknown";
+    if (statusEl) statusEl.textContent = `Could not start audio (${msg}). Click again. URL: ${resolvedSrc || "(none)"}`;
+    syncButtons(false);
+    console.warn("Audio play() failed:", err, "URL:", resolvedSrc);
+  }
+}
 
-  bgm.addEventListener("ended", ()=>{ loadTrack(current+1); tryPlay(); });
-  bgm.addEventListener("error", ()=>{
-    if (statusEl) statusEl.textContent = "Audio error. Check file path/format.";
-    syncUI();
+function pause(){
+  bgm.pause();
+  syncButtons(false);
+  if (statusEl) statusEl.textContent = "Paused.";
+}
+
+/* Wire events */
+if (bgm && playBtn && prevBtn && nextBtn && titleEl){
+  playBtn.addEventListener('click', ()=>{ if (bgm.paused) tryPlay(); else pause(); });
+  if (toggleBtn) toggleBtn.addEventListener('click', ()=>{ if (bgm.paused) tryPlay(); else pause(); });
+  prevBtn.addEventListener('click', ()=>{ load(idx-1).then(tryPlay); });
+  nextBtn.addEventListener('click', ()=>{ load(idx+1).then(tryPlay); });
+
+  bgm.addEventListener('ended', ()=>{ load(idx+1).then(tryPlay); });
+  bgm.addEventListener('error', ()=>{
+    const code = bgm.error && bgm.error.code;
+    if (statusEl) statusEl.textContent = `Audio error (code ${code || "?"}). URL: ${resolvedSrc || "(none)"}`;
+    syncButtons(false);
   });
 
   bgm.volume = 0.25;
-  loadTrack(0); // prepare first track (waits for a user click)
+  // Defer initial load until first click to satisfy strict mobile browsers
+  const armAndLoad = async ()=>{
+    document.removeEventListener('click', armAndLoad, true);
+    await load(0);
+  };
+  document.addEventListener('click', armAndLoad, true);
 }else{
-  console.warn("Music player elements not found. Check IDs: bgm, playPauseBtn, prevBtn, nextBtn, track-title");
+  console.warn("Music player elements not found. Check IDs.");
 }
 
 /* ---------- Reveal on scroll ---------- */
