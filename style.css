@@ -97,6 +97,18 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 .links a{color:var(--ink);text-decoration:none}
 .links a:hover{color:var(--accent)}
 
+.music-controls{
+  display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 8px;
+}
+.music-controls button{
+  background:#d4af37;color:#2c0a0a;border:none;padding:8px 14px;
+  border-radius:8px;font-weight:700;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+  transition:transform .15s, filter .2s;
+}
+.music-controls button:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+
+
 /* Footer */
 .footer .wrap{background:transparent;border:none;box-shadow:none;text-align:center;color:var(--muted)}
 
