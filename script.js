@@ -1,4 +1,4 @@
-/* ===== Gold fireflies + robust music + toggles + scroll reveal ===== */
+/* ===== Gold fireflies + playlist music + toggles + scroll reveal ===== */
 
 // ---------- Ambient fireflies ----------
 const canvas = document.getElementById('ambient');
@@ -54,7 +54,7 @@ function makeToggle(btnId, boxId, labels = ['Read','Hide']){
 
   const set = (open) => {
     btn.setAttribute('aria-expanded', String(open));
-    btn.textContent = open ? `${labels[1]} ${btn.textContent.replace(/^Read |Hide /,'')}` 
+    btn.textContent = open ? `${labels[1]} ${btn.textContent.replace(/^Read |Hide /,'')}`
                            : `${labels[0]} ${btn.textContent.replace(/^Read |Hide /,'')}`;
   };
 
@@ -66,7 +66,6 @@ function makeToggle(btnId, boxId, labels = ['Read','Hide']){
     set(!box.hidden);
   });
 }
-
 makeToggle('prologueBtn','prologueBox');
 makeToggle('sampleBtn','sampleBox');
 
@@ -85,26 +84,29 @@ const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const titleEl = document.getElementById("track-title");
 
-function loadTrack(i){
-  current = (i + tracks.length) % tracks.length;
-  bgm.src = tracks[current].src;
-  titleEl.textContent = tracks[current].title;
-  bgm.play().then(()=> sync()).catch(()=> sync());
+// Only wire up if the elements exist (prevents null errors)
+if (bgm && playBtn && prevBtn && nextBtn && titleEl) {
+  function loadTrack(i){
+    current = (i + tracks.length) % tracks.length;
+    bgm.src = tracks[current].src;
+    titleEl.textContent = tracks[current].title;
+    bgm.play().then(sync).catch(sync);  // autoplay might be blocked; sync UI anyway
+  }
+  function sync(){ playBtn.textContent = bgm.paused ? "▶" : "⏸"; }
+
+  playBtn.addEventListener("click", () => {
+    if (bgm.paused){ bgm.play().then(sync); } else { bgm.pause(); sync(); }
+  });
+  prevBtn.addEventListener("click", () => loadTrack(current-1));
+  nextBtn.addEventListener("click", () => loadTrack(current+1));
+  bgm.addEventListener("ended", () => loadTrack(current+1));
+
+  bgm.volume = 0.25;
+  loadTrack(0);
+} else {
+  // Helpful hint in console if IDs don’t match your HTML
+  console.warn("Music player elements not found. Check IDs: bgm, playPauseBtn, prevBtn, nextBtn, track-title");
 }
-function sync(){ playBtn.textContent = bgm.paused ? "▶" : "⏸"; }
-
-playBtn.addEventListener("click", () => {
-  if (bgm.paused){ bgm.play().then(sync); } else { bgm.pause(); sync(); }
-});
-prevBtn.addEventListener("click", () => loadTrack(current-1));
-nextBtn.addEventListener("click", () => loadTrack(current+1));
-bgm.addEventListener("ended", () => loadTrack(current+1));
-
-bgm.volume = 0.25;
-loadTrack(0);
-
-}
-
 
 // ---------- Reveal on scroll ----------
 const reveals = document.querySelectorAll('.reveal');
